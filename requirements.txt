@@ -1,3 +1,4 @@
+python-dotenv
 pika
 flask
 mysql-connector-python
