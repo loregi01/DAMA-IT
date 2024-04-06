@@ -4,3 +4,4 @@ COPY requirements.txt /code
 RUN pip install -r requirements.txt --no-cache-dir
 COPY . /code
 CMD python app.py
+EXPOSE 5000
