@@ -4,5 +4,5 @@ Change the variablies in the .env file (you've to create it in the root director
 Change the IP Address of the RabbitMQ connection parameters with the IP address of your RabbitMQ container <br>
 To navigate the web app, you have to look at localhost:5000 <br>
 <p align="center">
-  <img src="C:\Users\gizzi\OneDrive\Desktop\Dama-itImage.pptx" width="350" title="hover text">
+  <img src="architecture.png" width="350" title="hover text">
 </p>
