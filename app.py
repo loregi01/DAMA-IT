@@ -17,17 +17,24 @@ app = Flask(__name__)
 #students = cursor.fetchall()
 #connection.close()
 
+#cursor.execute('INSERT INTO students (FirstName, Surname) VALUES ("Lorenzo", "Russo3")')
+#connection.commit()
+#cursor.execute('Select * FROM students')
+#students = cursor.fetchall()
+#print(students)
+
+#connection.close()
+
+
 #credentials = pika.PlainCredentials(os.getenv("RABBITMQ_USERNAME"), os.getenv("RABBITMQ_PASSWORD"))
 #connection = pika.BlockingConnection (pika.ConnectionParameters(os.getenv("RABBITMQ_IP"), 5672, '/', credentials))
 #channel = connection.channel()
 #print(channel)
 
-#print(students) 
-
 @app.route('/api', methods=['POST'])
 def handle_api_request():
     # Gestisci la richiesta API qui
-    return "Risposta dal server Flask"
+    return "Risposta da marte4"
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000) 

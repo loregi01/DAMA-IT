@@ -8,3 +8,4 @@ CREATE TABLE students (
 );
 
 INSERT INTO students (FirstName, Surname) VALUES ("Lorenzo", "Gizzi");
+INSERT INTO students (FirstName, Surname) VALUES ("Massimo", "Mecella");
