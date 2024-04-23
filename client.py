@@ -1,3 +1,4 @@
+'''
 import requests
 
 def invia_richiesta_al_server():
@@ -12,3 +13,19 @@ def invia_richiesta_al_server():
 
 if __name__ == "__main__":
     invia_richiesta_al_server()
+'''
+import requests
+import time
+
+url = "http://127.0.0.1:5000"
+
+data = {"key": "value"}
+
+#response = requests.post(url, json=data)
+
+#print(response.text)
+
+while True:
+    response = requests.post(url, json=data)
+    time.sleep(5)
+    print(response.text)
