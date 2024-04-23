@@ -1,5 +1,6 @@
 import socketio
 import threading
+import PySide6.QtCore
 
 sio = socketio.Client()
 
@@ -41,10 +42,15 @@ def matched(data):
     #send_messages()
 
 if __name__ == '__main__':
-    sio.connect('http://127.0.0.1:5000')
+    #sio.connect('http://127.0.0.1:5000')
 
-    sio.wait()
+    #sio.wait()
 
+    # Prints PySide6 version
+    print(PySide6.__version__)
+
+    # Prints the Qt version used to compile PySide6
+    print(PySide6.QtCore.__version__)
 
 
 '''import requests
