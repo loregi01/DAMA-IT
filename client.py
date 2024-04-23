@@ -1,4 +1,53 @@
-import requests
+import socketio
+import threading
+
+sio = socketio.Client()
+
+
+def send_messages():
+    #while True:
+    msg = input("\nEnter your message (or 'exit' to quit): ")
+    
+    if msg.lower() == 'exit':
+        sio.disconnect()
+    
+    sio.emit('message', msg)
+    print("Waiting answer...\n")
+    #sio.disconnect()
+
+@sio.event
+def connect():
+    name = input("Enter your name: ")
+    lv = input("Your game level: ")
+    
+    settings = {'name': name, 'level': lv}
+    sio.emit('connect_client', settings)
+    print('Connected to server')
+
+@sio.event
+def message(data):
+    print(data)
+    send_messages()
+
+@sio.event
+def starting():
+    #print(data)
+    send_messages()
+
+@sio.event
+def matched(data):
+    print(data)
+    # Start the thread for sending messages ????
+    #send_messages()
+
+if __name__ == '__main__':
+    sio.connect('http://127.0.0.1:5000')
+
+    sio.wait()
+
+
+
+'''import requests
 
 def invia_richiesta_al_server():
     url = 'http://127.0.0.1:5000/api'
@@ -11,4 +60,4 @@ def invia_richiesta_al_server():
         print("Errore durante l'invio della richiesta:", response.status_code)
 
 if __name__ == "__main__":
-    invia_richiesta_al_server()
+    invia_richiesta_al_server()'''
