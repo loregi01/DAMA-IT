@@ -1,6 +1,10 @@
 from flask import Flask
 from flask_socketio import SocketIO, join_room, leave_room
 from flask import request
+import pika
+import os
+import sys
+from my_email import email_functions
 
 app = Flask(__name__)
 socketio = SocketIO(app)
