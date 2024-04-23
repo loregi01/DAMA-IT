@@ -2,4 +2,5 @@ python-dotenv
 pika
 flask
 mysql-connector-python
-flask_socketio
+Flask-SocketIO
+eventlet
