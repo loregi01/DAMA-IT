@@ -9,15 +9,11 @@ def send_messages():
     #while True:
     msg = input("\nEnter your message (or 'exit' to quit): ")
     
-    #if msg.lower() == 'exit':
-        #sio.disconnect()
-    #else:
     if msg == 'exit':
         sio.emit('message', msg)
     else:
         sio.emit('message', msg)
         print("Waiting answer...\n")
-    #sio.disconnect()
 
 @sio.event
 def connect():
