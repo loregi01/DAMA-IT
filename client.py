@@ -9,11 +9,14 @@ def send_messages():
     #while True:
     msg = input("\nEnter your message (or 'exit' to quit): ")
     
-    if msg.lower() == 'exit':
-        sio.disconnect()
-    
-    sio.emit('message', msg)
-    print("Waiting answer...\n")
+    #if msg.lower() == 'exit':
+        #sio.disconnect()
+    #else:
+    if msg == 'exit':
+        sio.emit('message', msg)
+    else:
+        sio.emit('message', msg)
+        print("Waiting answer...\n")
     #sio.disconnect()
 
 @sio.event
@@ -41,16 +44,21 @@ def matched(data):
     # Start the thread for sending messages ????
     #send_messages()
 
-if __name__ == '__main__':
-    #sio.connect('http://127.0.0.1:5000')
+@sio.event
+def disconnect():
+    print("Disconnessione in corso")
+    sio.disconnect()
 
-    #sio.wait()
+if __name__ == '__main__':
+    sio.connect('http://127.0.0.1:5000')
+
+    sio.wait()
 
     # Prints PySide6 version
-    print(PySide6.__version__)
+    #print(PySide6.__version__)
 
     # Prints the Qt version used to compile PySide6
-    print(PySide6.QtCore.__version__)
+    #print(PySide6.QtCore.__version__)
 
 
 '''import requests
