@@ -1,29 +1,6 @@
-from views.login_page import Ui_MainWindow
-from PySide6.QtWidgets import QApplication, QMainWindow
-import sys
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        # Inizializza l'interfaccia utente generata da Qt Designer
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    
-    # Crea e mostra la finestra principale
-    window = MainWindow()
-    window.show()
-
-    sys.exit(app.exec())
-
-
-
-
-'''import socketio
+import socketio
 import threading
+import PySide6.QtCore
 
 sio = socketio.Client()
 
@@ -32,12 +9,11 @@ def send_messages():
     #while True:
     msg = input("\nEnter your message (or 'exit' to quit): ")
     
-    if msg.lower() == 'exit':
-        sio.disconnect()
-    
-    sio.emit('message', msg)
-    print("Waiting answer...\n")
-    #sio.disconnect()
+    if msg == 'exit':
+        sio.emit('message', msg)
+    else:
+        sio.emit('message', msg)
+        print("Waiting answer...\n")
 
 @sio.event
 def connect():
@@ -64,12 +40,17 @@ def matched(data):
     # Start the thread for sending messages ????
     #send_messages()
 
+@sio.event
+def disconnect():
+    print("Disconnessione in corso")
+    sio.disconnect()
+
 if __name__ == '__main__':
     sio.connect('http://127.0.0.1:5000')
 
     sio.wait()
 
-'''
+
 
 '''import requests
 
