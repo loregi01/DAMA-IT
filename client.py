@@ -1,4 +1,28 @@
-import socketio
+from views.login_page import Ui_MainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow
+import sys
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Inizializza l'interfaccia utente generata da Qt Designer
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    
+    # Crea e mostra la finestra principale
+    window = MainWindow()
+    window.show()
+
+    sys.exit(app.exec())
+
+
+
+
+'''import socketio
 import threading
 
 sio = socketio.Client()
@@ -45,7 +69,7 @@ if __name__ == '__main__':
 
     sio.wait()
 
-
+'''
 
 '''import requests
 

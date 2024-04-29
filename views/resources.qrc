@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>views/graphics/background1.jpg</file>
+    <file>views/graphics/background2.jpg</file>
+</qresource>
+</RCC>
