@@ -5,10 +5,32 @@ import pika
 import os
 import sys
 from my_email import email_functions
+import mysql.connector
+from dotenv import load_dotenv
+
+load_dotenv()
+
+connection = mysql.connector.connect(user=os.getenv("MYSQL_USERNAME"), password=os.getenv("MYSQL_PASSWORD"), host='mysql', port="3306", database=os.getenv("MYSQL_DB"))
+print("DB connected")
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
+cursor = connection.cursor()
+cursor.execute('SELECT * FROM user')
+users = cursor.fetchall()
+#connection.close()
+print(users)
+
+#cursor.execute('INSERT INTO statistic(TotGames, TotWins, TotDraw, Elo, SLevel) VALUES("6","2","2","6","3")')
+#connection.commit()
+#cursor.execute('INSERT INTO user(FirstName, Surname, Email, UPassword, Username, Birthdate, Statistic) VALUES ("Maximum","Mecellum","mecellum@taccituam.it", "dockermerdum", "mmlover", "30/02/400", 2);')
+#connection.commit()
+#cursor.execute('Select * FROM user')
+#users = cursor.fetchall()
+#print(users)
+
+"""
 connected_clients = {}
 matched_clients = {}
 
@@ -66,24 +88,31 @@ def handle_message(data):
                 socketio.emit('message', f'{sender_name}: {data}', room=receiver_id)
                 #socketio.emit('message', f'{sender_name}: {data}', room=sender_id)
 
+@socketio.on('credentials')
+def handle_credentials(credentials):
+    print(credentials)
+    cursor = connection.cursor()
+    cursor.execute('INSERT INTO students (FirstName, Surname) VALUES ("Lorenzo", "Russo3")')
+    connection.commit()
+    #cursor.execute('Select * FROM students')
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)
 
 
+from flask import Flask, render_template
+import mysql.connector
+import pika
+import os
+from dotenv import load_dotenv
+from flask_socketio import SocketIO
 
-#from flask import Flask, render_template
-#import mysql.connector
-#import pika
-#import os
-#from dotenv import load_dotenv
-#from flask_socketio import SocketIO
+load_dotenv()
 
-#load_dotenv()
+app = Flask(__name__)
 
-#app = Flask(__name__)
-
-#connection = mysql.connector.connect(user=os.getenv("MYSQL_USERNAME"), password=os.getenv("MYSQL_PASSWORD"), host='mysql', port="3306", database=os.getenv("MYSQL_DB"))
-#print("DB connected")
+connection = mysql.connector.connect(user=os.getenv("MYSQL_USERNAME"), password=os.getenv("MYSQL_PASSWORD"), host='mysql', port="3306", database=os.getenv("MYSQL_DB"))
+print("DB connected")
 
 #cursor = connection.cursor()
 #cursor.execute('Select * FROM students')
@@ -108,6 +137,8 @@ if __name__ == '__main__':
 #def handle_api_request():
     # Gestisci la richiesta API qui
 #    return "Risposta da marte4"
+
+"""
 
 #if __name__ == "__main__":
 #    app.run(host='0.0.0.0', port=5000) 

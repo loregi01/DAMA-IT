@@ -1,0 +1,69 @@
+use db;
+
+DROP TABLE IF EXISTS statistic, user, guest, umessage, play, friend;
+
+CREATE TABLE statistic (
+    StatisticID int not null AUTO_INCREMENT,
+    TotGames varchar(100) NOT NULL,
+    TotWins varchar(100) NOT NULL,
+    TotDraw varchar(100) NOT NULL,
+    Elo varchar(100) NOT NULL,
+    SLevel varchar(100) NOT NULL,
+    PRIMARY KEY (StatisticID)
+);
+
+CREATE TABLE user (
+    UserID int not null AUTO_INCREMENT,
+    FirstName varchar(100) NOT NULL,
+    Surname varchar(100) NOT NULL,
+    Email varchar(100) NOT NULL,
+    UPassword varchar(100) NOT NULL,
+    Username varchar(100) NOT NULL,
+    Birthdate varchar(100) NOT NULL,
+    Statistic int NOT NULL,
+    PRIMARY KEY (UserID),
+    FOREIGN KEY (Statistic) REFERENCES statistic (StatisticID)
+);
+
+CREATE TABLE guest (
+    GuestID int not null AUTO_INCREMENT,
+    RandomUsername varchar(100) NOT NULL,
+    PRIMARY KEY (GuestID)
+);
+
+CREATE TABLE umessage (
+    MessageID int not null AUTO_INCREMENT,
+    Content varchar(100) NOT NULL,
+    MDateTime varchar(100) NOT NULL,
+    Sender varchar(100) NOT NULL,
+    PRIMARY KEY (MessageID)
+);
+
+CREATE TABLE friend (
+    FriendID int not null AUTO_INCREMENT,
+    User1 int NOT NULL,
+    User2 int NOT NULL,
+    Fmessage int NOT NULL,
+    PRIMARY KEY (FriendID),
+    FOREIGN KEY (User1) REFERENCES user (UserID),
+    FOREIGN KEY (User2) REFERENCES user (UserID),
+    FOREIGN KEY (Fmessage) REFERENCES umessage (MessageID)
+);
+
+CREATE TABLE play (
+    PlayID int not null AUTO_INCREMENT,
+    Player1 int NOT NULL,
+    Player2 int NOT NULL,
+    PDateTime varchar(100) NOT NULL,
+    WhitePlayer int NOT NULL,
+    MinGameDuration varchar(100) NOT NULL,
+    MaxGameDuration varchar(100) NOT NULL,
+    MinOpponentScore varchar(100) NOT NULL,
+    MaxOpponentScore varchar(100) NOT NULL,
+    PRIMARY KEY (PlayID),
+    FOREIGN KEY (Player1) REFERENCES user (UserID),
+    FOREIGN KEY (Player2) REFERENCES user (UserID)
+);
+
+INSERT INTO statistic(TotGames, TotWins, TotDraw, Elo, SLevel) VALUES("10","5","2","2","1");
+INSERT INTO user(FirstName, Surname, Email, UPassword, Username, Birthdate, Statistic) VALUES ("Massimo","Mecella","mecella@taccitua.it", "dockermerda", "mmlover", "30/02/1400", 1);

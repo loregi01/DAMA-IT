@@ -1,6 +1,10 @@
 from views.login_page import Ui_MainWindow
+import views.login_page
 from PySide6.QtWidgets import QApplication, QMainWindow
 import sys
+
+import socketio
+sio = socketio.Client()
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -10,9 +14,25 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        self.ui.btn_login.clicked.connect(self.send_credentials)
+
+    def send_credentials(self):
+        self.ui.retrieve_credentials()
+        email = self.ui.email
+        password = self.ui.password
+        sio.connect('http://127.0.0.1:5000')
+        #sio.wait()
+        data = f"{email},{password}"
+        print(f"My credentials sent... email:{email}, pass:{password}")
+        sio.emit('credentials', data)
+
 if __name__ == "__main__":
+
+    #sio.connect('http://127.0.0.1:5000')
+    #sio.wait()
+
     app = QApplication(sys.argv)
-    
+
     # Crea e mostra la finestra principale
     window = MainWindow()
     window.show()

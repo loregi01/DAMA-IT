@@ -4,6 +4,8 @@ from PySide6 import QtCore, QtGui, QtWidgets
 #print(os.getcwd())
 
 class Ui_MainWindow(object):
+    email = ""
+    password = ""
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(900, 600)
@@ -89,6 +91,7 @@ class Ui_MainWindow(object):
         self.btn_login.setAutoDefault(False)
         self.btn_login.setFlat(False)
         self.btn_login.setObjectName("btn_login")
+        self.btn_login.clicked.connect(self.retrieve_credentials)
         self.widget_8 = QtWidgets.QWidget(parent=self.widget_4)
         self.widget_8.setGeometry(QtCore.QRect(0, 320, 220, 30))
         self.widget_8.setObjectName("widget_8")
@@ -124,6 +127,10 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retrieve_credentials (self):
+        self.email = self.txt_email.text()
+        self.password = self.txt_password.text()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
