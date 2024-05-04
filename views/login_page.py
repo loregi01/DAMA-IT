@@ -1,7 +1,8 @@
 from PySide6 import QtCore, QtGui, QtWidgets
-
-#import os
-#print(os.getcwd())
+from PySide6.QtCore import Qt, QUrl, QFileInfo
+from PySide6.QtGui import QDesktopServices
+import os
+from PySide6.QtWebEngineWidgets import QWebEngineView
 
 class Ui_MainWindow(object):
     email = ""

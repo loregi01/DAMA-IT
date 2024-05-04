@@ -1,6 +1,7 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file>views/graphics/background1.jpg</file>
-    <file>views/graphics/background2.jpg</file>
-</qresource>
+<RCC>
+  <qresource prefix="background"/>
+  <qresource prefix="newPrefix">
+    <file>graphics/background1.png</file>
+    <file>graphics/background2.jpg</file>
+  </qresource>
 </RCC>
