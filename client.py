@@ -7,7 +7,7 @@ import sys
 import socketio
 sio = socketio.Client()
 
-class NewWindow(QMainWindow):
+class SignIn(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
     
     def new_window(self):
         self.close()
-        self.new_window_instance = NewWindow()  # Creare un'istanza di NewWindow
+        self.new_window_instance = SignIn()  # Creare un'istanza di NewWindow
         self.new_window_instance.show()
 
     def on_signin_clicked(self, event):
