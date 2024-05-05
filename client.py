@@ -1,20 +1,41 @@
 from views.login_page import Ui_MainWindow
+from views.signup_page import Ui_Form
 import views.login_page
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
 import sys
 
 import socketio
 sio = socketio.Client()
 
+class NewWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.ui = Ui_Form()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.new_window_instance = None
 
         # Inizializza l'interfaccia utente generata da Qt Designer
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
         self.ui.btn_login.clicked.connect(self.send_credentials)
+        self.ui.lbl_signin.mousePressEvent = self.on_signin_clicked
+    
+    def new_window(self):
+        self.close()
+        self.new_window_instance = NewWindow()  # Creare un'istanza di NewWindow
+        self.new_window_instance.show()
+
+    def on_signin_clicked(self, event):
+        print("Sign In label clicked")
+        self.new_window()
 
     def send_credentials(self):
         self.ui.retrieve_credentials()
@@ -25,6 +46,7 @@ class MainWindow(QMainWindow):
         data = f"{email},{password}"
         print(f"My credentials sent... email:{email}, pass:{password}")
         sio.emit('credentials', data)
+
 
 if __name__ == "__main__":
 

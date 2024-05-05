@@ -1,12 +1,30 @@
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt, QUrl, QFileInfo
+from PySide6.QtCore import Qt, QUrl, QFileInfo, Signal
 from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import QLabel
 import os
 from PySide6.QtWebEngineWidgets import QWebEngineView
+
+class ClickableLabel(QLabel):
+    clicked = Signal()
+
+    def __init__(self, text='', parent=None):
+        super().__init__(text, parent)
+        self.setCursor(Qt.PointingHandCursor)
+        self.setStyleSheet("color: blue; text-decoration: underline;")
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+
 
 class Ui_MainWindow(object):
     email = ""
     password = ""
+    
+    #def on_signin_clicked(self):
+        #print("Sign In label clicked")
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(900, 600)
@@ -106,8 +124,10 @@ class Ui_MainWindow(object):
 "")
         self.lbl_forgot.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.lbl_forgot.setObjectName("lbl_forgot")
-        self.lbl_signin = QtWidgets.QLabel(parent=self.widget_4)
+        self.lbl_signin = ClickableLabel("Sign In", parent=self.widget_4)
+        #self.lbl_signin = QtWidgets.QLabel(parent=self.widget_4)
         self.lbl_signin.setGeometry(QtCore.QRect(0, 350, 220, 30))
+        #self.lbl_signin.clicked.connect(self.on_signin_clicked)
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(10)
