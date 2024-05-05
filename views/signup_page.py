@@ -9,6 +9,12 @@ from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
     QPushButton, QSizePolicy, QTextEdit, QWidget)
 
 class Ui_Form(object):
+    Rname = ""
+    Rsurname = ""
+    Remail = ""
+    Rbirthdate = ""
+    Rpassword = ""
+
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
@@ -160,4 +166,10 @@ class Ui_Form(object):
         self.confirm_utton.setText(QCoreApplication.translate("Form", u"Confirm", None))
         self.label_2.setText(QCoreApplication.translate("Form", u"Click here to go back", None))
     # retranslateUi
-
+     
+    def retrieve_credentials (self):
+        self.Rname = self.first_name.toPlainText()
+        self.Rsurname = self.surname.toPlainText()
+        self.Remail = self.email.toPlainText()
+        self.Rbirthdate = self.birthdate.toPlainText()
+        self.Rpassword = self.lineEdit.text()

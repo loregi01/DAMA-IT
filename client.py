@@ -11,15 +11,30 @@ class SignIn(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
+        self.ui.confirm_utton.clicked.connect(self.send_credentials)
 
     def setup_ui(self):
         self.ui = Ui_Form()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
 
+    def send_credentials(self):
+        self.ui.retrieve_credentials()
+        name = self.ui.Rname
+        surname = self.ui.Rsurname
+        email = self.ui.Remail
+        birthdate = self.ui.Rbirthdate
+        password = self.ui.Rpassword
+
+        data = f"{name},{surname},{email},{birthdate},{password}"
+        print(f"My credentials sent... name:{name}, surname:{surname}, email:{email}, birthdate:{birthdate}, password:{password}")
+        sio.emit('credentials', data)
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.new_window_instance = None
+        sio.connect('http://127.0.0.1:5000')
 
         # Inizializza l'interfaccia utente generata da Qt Designer
         self.ui = Ui_MainWindow()
@@ -41,7 +56,7 @@ class MainWindow(QMainWindow):
         self.ui.retrieve_credentials()
         email = self.ui.email
         password = self.ui.password
-        sio.connect('http://127.0.0.1:5000')
+        #sio.connect('http://127.0.0.1:5000')
         #sio.wait()
         data = f"{email},{password}"
         print(f"My credentials sent... email:{email}, pass:{password}")

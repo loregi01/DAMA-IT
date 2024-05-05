@@ -16,11 +16,20 @@ print("DB connected")
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-cursor = connection.cursor()
-cursor.execute('SELECT * FROM user')
-users = cursor.fetchall()
+#cursor = connection.cursor()
+#cursor.execute('SELECT * FROM user')
+#users = cursor.fetchall()
 #connection.close()
-print(users)
+#print(users)
+
+@socketio.on('credentials')
+def handle_credentials(credentials):
+    print(credentials)
+
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+
 
 #cursor.execute('INSERT INTO statistic(TotGames, TotWins, TotDraw, Elo, SLevel) VALUES("6","2","2","6","3")')
 #connection.commit()
