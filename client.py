@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
     
     def new_window(self):
         self.close()
-        self.new_window_instance = SignIn()  # Creare un'istanza di NewWindow
+        self.new_window_instance = SignIn()  
         self.new_window_instance.show()
 
     def on_signin_clicked(self, event):
