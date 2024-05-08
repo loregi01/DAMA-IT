@@ -1,8 +1,9 @@
 from views.login_page import Ui_MainWindow
-from views.signup_page import Ui_Form
+from views.sign_up_page import Ui_Form
 import views.login_page
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
 import sys
+import hashlib
 
 import socketio
 sio = socketio.Client()
@@ -11,7 +12,7 @@ class SignIn(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
-        self.ui.confirm_utton.clicked.connect(self.send_credentials)
+        self.ui.confirm_button.clicked.connect(self.send_credentials)
 
     def setup_ui(self):
         self.ui = Ui_Form()  # Inizializza Ui_Form
@@ -24,9 +25,15 @@ class SignIn(QMainWindow):
         email = self.ui.Remail
         birthdate = self.ui.Rbirthdate
         password = self.ui.Rpassword
+        username = self.ui.RUsername
 
-        data = f"{name},{surname},{email},{birthdate},{password}"
-        print(f"My credentials sent... name:{name}, surname:{surname}, email:{email}, birthdate:{birthdate}, password:{password}")
+        password_encoded = password.encode('utf-8')
+        hash_object = hashlib.sha256()
+        hash_object.update(password_encoded)
+        password = hash_object.hexdigest()
+
+        data = {'name': name, 'surname': surname, 'email': email, 'password': password, 'username': username, 'birthdate': birthdate}
+        print(f"My credentials sent... name:{name}, surname:{surname}, email:{email}, birthdate:{birthdate}, password:{password}, username:{username}")
         sio.emit('credentials', data)
 
 

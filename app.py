@@ -12,9 +12,11 @@ load_dotenv()
 
 connection = mysql.connector.connect(user=os.getenv("MYSQL_USERNAME"), password=os.getenv("MYSQL_PASSWORD"), host='mysql', port="3306", database=os.getenv("MYSQL_DB"))
 print("DB connected")
+cursor = connection.cursor()
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+
 
 #cursor = connection.cursor()
 #cursor.execute('SELECT * FROM user')
@@ -24,8 +26,18 @@ socketio = SocketIO(app)
 
 @socketio.on('credentials')
 def handle_credentials(credentials):
-    print(credentials)
-
+    cursor.execute(f'INSERT INTO statistic(TotGames, TotWins, TotDraw, Elo, SLevel) VALUES(0,0,0,0,0)')
+    connection.commit()
+    cursor.execute('SELECT MAX(StatisticID) FROM statistic')
+    statistic_id = int(cursor.fetchall()[0][0])
+    firstName = credentials['name']
+    surname = credentials['surname']
+    email = credentials['email']
+    password = credentials['password']
+    username = credentials['username']
+    birthdate = credentials['birthdate']
+    cursor.execute(f'INSERT INTO user(FirstName, Surname, Email, UPassword, Username, Birthdate, Statistic) VALUES ("{firstName}","{surname}","{email}","{password}","{username}","{birthdate}",{statistic_id});')
+    connection.commit()
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)
