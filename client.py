@@ -1,5 +1,6 @@
 from views.login_page import Ui_MainWindow
 from views.sign_up_page import Ui_Form
+import views.sign_up_page
 import views.login_page
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
 import sys
@@ -25,6 +26,7 @@ sio = socketio.Client()
     #sio.emit('connect_client', settings)
 
 Semail = None
+signup_window = None
 
 class SignIn(QMainWindow):
     def __init__(self):
@@ -120,7 +122,9 @@ class MainWindow(QMainWindow):
     
     def new_window(self):
         self.close()
-        self.new_window_instance = SignIn()  
+        self.new_window_instance = SignIn()
+        global signup_window
+        signup_window = self.new_window_instance  
         self.new_window_instance.show()
 
     def on_signin_clicked(self, event):
@@ -138,10 +142,12 @@ class MainWindow(QMainWindow):
 
 @sio.event 
 def credentials_error (type_of_error):
+    username_field = views.sign_up_page.RUsername
     if type_of_error == 'username':
         print("Username used")
-        instance = SignIn() 
-        instance.change_username
+        username_field.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
+        #username_field.setText("")
+        #username_field.setPlaceholderText("Username is already used")
 
 @sio.event
 def confirmation_signup():

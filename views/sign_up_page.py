@@ -8,6 +8,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
     QPushButton, QSizePolicy, QTextEdit, QWidget)
 
+RUsername = ""
 class Ui_Form(object):
     Rname = ""
     Rsurname = ""
@@ -15,7 +16,7 @@ class Ui_Form(object):
     Rbirthdate = ""
     Rpassword = ""
     RConfirmPassword = ""
-    RUsername = ""
+    RUsernameField = None
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
@@ -109,6 +110,8 @@ class Ui_Form(object):
 "text-align: center;\n"
 "")
         self.username.setFrameShape(QFrame.Shape.Box)
+        global RUsername
+        RUsername = self.username
         self.widget_5 = QWidget(self.widget_2)
         self.widget_5.setObjectName(u"widget_5")
         self.widget_5.setGeometry(QRect(70, 430, 141, 91))
