@@ -14,6 +14,7 @@ class Ui_Form(object):
     Remail = ""
     Rbirthdate = ""
     Rpassword = ""
+    RConfirmPassword = ""
     RUsername = ""
     def setupUi(self, Form):
         if not Form.objectName():
@@ -193,3 +194,4 @@ class Ui_Form(object):
         self.RUsername = self.username.toPlainText()
         self.Rbirthdate = self.birthdate.toPlainText()
         self.Rpassword = self.password.text()
+        self.RConfirmPassword = self.confirm_password.text()
