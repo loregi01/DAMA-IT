@@ -1,5 +1,6 @@
 from views.login_page import Ui_MainWindow
 from views.sign_up_page import Ui_Form
+from views.home_page import Ui_Form as Ui_HomePage
 import views.sign_up_page
 import views.login_page
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
@@ -25,14 +26,29 @@ sio = socketio.Client()
     #settings = {'name': name, 'level': lv}
     #sio.emit('connect_client', settings)
 
+authenticated = False
 Semail = None
 signup_window = None
+homepage_window = None
 
 class SignIn(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.new_window_instance = None
         self.setup_ui()
         self.ui.confirm_button.clicked.connect(self.send_credentials)
+        self.ui.confirm_button.clicked.connect(self.on_confirm_clicked)
+
+    def new_window(self):
+        self.close()
+        self.new_window_instance = HomePage()
+        global homepage_window
+        homepage_window = self.new_window_instance  
+        self.new_window_instance.show()
+
+    def on_confirm_clicked(self):
+        print("Confirm button clicked")
+        self.new_window()
 
     def setup_ui(self):
         self.ui = Ui_Form()  # Inizializza Ui_Form
@@ -139,6 +155,14 @@ class MainWindow(QMainWindow):
         print(f"My credentials sent... email:{email}, pass:{password}")
         sio.emit('credentials', data)
 
+class HomePage(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.ui = Ui_HomePage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
 
 @sio.event 
 def credentials_error (type_of_error):
@@ -159,6 +183,9 @@ def confirmation_signup():
     body = "Welcome in Dama-IT, you're now part of our family ;-)"
     send_email(sender_email, sender_password, receiver_email, subject, body)
     print("Mail inviata")
+    #global authenticated
+    #authenticated = True
+    #signup_window.on_confirm_clicked()
 
 @sio.event
 def connect():
@@ -168,7 +195,6 @@ def connect():
     #settings = {'name': name, 'level': lv}
     sio.emit('connect_client')
     print('Connected to server')
-
 '''
 def send_messages():
     #while True:
