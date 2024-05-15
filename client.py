@@ -18,6 +18,8 @@ load_dotenv()
 import socketio
 sio = socketio.Client()
 
+Uname = ""
+
 #@sio.event
 #def connect():
     #sio.emit('connect_client')
@@ -128,6 +130,8 @@ class MainWindow(QMainWindow):
 
     #signal for comunicate between thread
     signup_confirmed = Signal(QMainWindow)
+    login_success_signal = Signal(QMainWindow)
+    login_unsuccess = Signal(QMainWindow)
 
     def __init__(self):
         super().__init__()
@@ -146,14 +150,24 @@ class MainWindow(QMainWindow):
 
         #signal setup
         self.signup_confirmed.connect(self.on_confirm_clicked)
+        self.login_success_signal.connect(self.on_confirm_clicked)
+        self.login_unsuccess.connect(self.on_login_unsuccess)
+
+    def on_login_unsuccess(self):
+        email_field = views.login_page.email
+        password_field = views.login_page.password
+
+        email_field.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
+        password_field.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
     
     def new_window1(self, old_window):
         old_window.close()
         #self.new_window_instance = HomePage()
         #global homepage_window
         #homepage_window = self.new_window_instance
-        self.homepage_window = HomePage()  
+        self.homepage_window = HomePage() 
         self.homepage_window.show()
+        self.homepage_window.user_field.setText(f"Hi, {Uname}")
 
     def on_confirm_clicked(self, old_window):
         print("Confirm button clicked from MainWindow after comunication with server")
@@ -175,11 +189,14 @@ class MainWindow(QMainWindow):
         self.ui.retrieve_credentials()
         email = self.ui.email
         password = self.ui.password
-        data = f"{email},{password}"
+        data = {}
+        data['email'] = email
+        data['password'] = password
         print(f"My credentials sent... email:{email}, pass:{password}")
-        sio.emit('credentials', data)
+        sio.emit('login_credentials', data)
 
 class HomePage(QMainWindow):
+    user_field = None
     def __init__(self):
         super().__init__()
         self.setup_ui()
@@ -187,6 +204,19 @@ class HomePage(QMainWindow):
     def setup_ui(self):
         self.ui = Ui_HomePage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.user_field = self.ui.label_3
+
+@sio.event
+def login_success():
+    print('Login Success')
+    #global Uname
+    #Uname = data
+    window.login_success_signal.emit(window)
+
+@sio.event
+def login_unsuccess():
+    print('Login unsuccess')
+    window.login_unsuccess.emit(window)
 
 @sio.event 
 def credentials_error (type_of_error):

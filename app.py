@@ -7,6 +7,7 @@ import sys
 from my_email import email_functions
 import mysql.connector
 from dotenv import load_dotenv
+import hashlib
 
 load_dotenv()
 connected_clients = {}
@@ -54,6 +55,24 @@ def handle_credentials(credentials):
         cursor.execute(f'INSERT INTO user(FirstName, Surname, Email, UPassword, Username, Birthdate, Statistic) VALUES ("{firstName}","{surname}","{email}","{password}","{username}","{birthdate}",{statistic_id});')
         connection.commit()
         socketio.emit('confirmation_signup')
+
+@socketio.on('login_credentials')
+def handle_login_credentials (data):
+    inserted_email = data['email']
+    inserted_password = data['password']
+
+    password_encoded = inserted_password.encode('utf-8')
+    hash_object = hashlib.sha256()
+    hash_object.update(password_encoded)
+    password = hash_object.hexdigest()
+
+    cursor.execute(f'SELECT * FROM user WHERE Email="{inserted_email}" AND UPassword="{password}"')
+    result = cursor.fetchall()    
+
+    if result:
+        socketio.emit('login_success', room = request.sid)   
+    else:
+        socketio.emit('login_unsuccess', room = request.sid) 
 
 @socketio.on('connect_client')
 def handle_connect():

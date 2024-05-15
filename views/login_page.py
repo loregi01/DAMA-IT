@@ -21,6 +21,9 @@ class ClickableLabel(QLabel):
 class Ui_MainWindow(object):
     email = ""
     password = ""
+
+    email = None
+    password = None
     
     #def on_signin_clicked(self):
         #print("Sign In label clicked")
@@ -84,6 +87,8 @@ class Ui_MainWindow(object):
         self.txt_email.setStyleSheet("border-radius: 10px; padding-left: 5px\n"
 "")
         self.txt_email.setObjectName("txt_email")
+        global email
+        email = self.txt_email
         self.widget_6 = QtWidgets.QWidget(parent=self.widget_4)
         self.widget_6.setGeometry(QtCore.QRect(0, 130, 220, 30))
         self.widget_6.setObjectName("widget_6")
@@ -97,6 +102,8 @@ class Ui_MainWindow(object):
 "")
         self.txt_password.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.txt_password.setObjectName("txt_password")
+        global password
+        password = self.txt_password
         self.widget_7 = QtWidgets.QWidget(parent=self.widget_4)
         self.widget_7.setGeometry(QtCore.QRect(0, 250, 220, 30))
         self.widget_7.setObjectName("widget_7")
