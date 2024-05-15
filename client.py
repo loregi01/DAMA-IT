@@ -4,6 +4,7 @@ from views.home_page import Ui_Form as Ui_HomePage
 import views.sign_up_page
 import views.login_page
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
+from PySide6.QtCore import Signal
 import sys
 import hashlib
 import time
@@ -28,8 +29,8 @@ sio = socketio.Client()
 
 authenticated = False
 Semail = None
-signup_window = None
-homepage_window = None
+#signup_window = None
+#homepage_window = None
 
 class SignIn(QMainWindow):
     def __init__(self):
@@ -37,7 +38,7 @@ class SignIn(QMainWindow):
         self.new_window_instance = None
         self.setup_ui()
         self.ui.confirm_button.clicked.connect(self.send_credentials)
-        self.ui.confirm_button.clicked.connect(self.on_confirm_clicked)
+        #self.ui.confirm_button.clicked.connect(self.on_confirm_clicked)
 
     def new_window(self):
         self.close()
@@ -124,6 +125,10 @@ class SignIn(QMainWindow):
         self.ui.username.setPlaceholderText("Username is already used")
 
 class MainWindow(QMainWindow):
+
+    #signal for comunicate between thread
+    signup_confirmed = Signal(QMainWindow)
+
     def __init__(self):
         super().__init__()
         self.new_window_instance = None
@@ -135,13 +140,32 @@ class MainWindow(QMainWindow):
 
         self.ui.btn_login.clicked.connect(self.send_credentials)
         self.ui.lbl_signin.mousePressEvent = self.on_signin_clicked
+
+        self.signup_window = None
+        self.homepage_window = None
+
+        #signal setup
+        self.signup_confirmed.connect(self.on_confirm_clicked)
     
+    def new_window1(self, old_window):
+        old_window.close()
+        #self.new_window_instance = HomePage()
+        #global homepage_window
+        #homepage_window = self.new_window_instance
+        self.homepage_window = HomePage()  
+        self.homepage_window.show()
+
+    def on_confirm_clicked(self, old_window):
+        print("Confirm button clicked from MainWindow after comunication with server")
+        self.new_window1(old_window)
+
     def new_window(self):
         self.close()
-        self.new_window_instance = SignIn()
-        global signup_window
-        signup_window = self.new_window_instance  
-        self.new_window_instance.show()
+        #self.new_window_instance = SignIn()
+        #global signup_window
+        #self.signup_window = new_window_instance  
+        self.signup_window = SignIn()  
+        self.signup_window.show()
 
     def on_signin_clicked(self, event):
         print("Sign In label clicked")
@@ -183,6 +207,10 @@ def confirmation_signup():
     body = "Welcome in Dama-IT, you're now part of our family ;-)"
     send_email(sender_email, sender_password, receiver_email, subject, body)
     print("Mail inviata")
+
+    #signal emit
+    window.signup_confirmed.emit(window.signup_window)
+
     #global authenticated
     #authenticated = True
     #signup_window.on_confirm_clicked()
