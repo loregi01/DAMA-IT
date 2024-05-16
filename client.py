@@ -1,10 +1,11 @@
 from views.login_page import Ui_MainWindow
 from views.sign_up_page import Ui_Form
 from views.home_page import Ui_Form as Ui_HomePage
+from views.board import Board
 import views.sign_up_page
 import views.login_page
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QSize
 import sys
 import hashlib
 import time
@@ -200,11 +201,24 @@ class HomePage(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
+        self.ui.pushButton.clicked.connect(self.game_start)
 
     def setup_ui(self):
         self.ui = Ui_HomePage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
         self.user_field = self.ui.label_3
+    
+    def game_start(self):
+        window.homepage_window.close()
+        mode = "HUMAN_VS_HUMAN"
+        difficulty = 0
+        playerIsWhite = True
+        up = False
+        turn = False
+        self.board = Board(mode, difficulty, playerIsWhite, up, turn)  # Create an instance of the Board class
+        self.board.setFixedSize(QSize(900, 600))
+        self.board.show()
+
 
 @sio.event
 def login_success():
