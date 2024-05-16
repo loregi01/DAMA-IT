@@ -12,7 +12,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(680, 600)
+        Form.resize(900, 600)
         Form.setStyleSheet(u"background-image: url(views/graphics/background1.png);\n"
 "font: 14pt \"Times New Roman\";")
         self.label = QLabel(Form)
