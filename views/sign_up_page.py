@@ -5,10 +5,25 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtCore import Qt, QUrl, QFileInfo, Signal
 from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
     QPushButton, QSizePolicy, QTextEdit, QWidget)
 
 RUsername = ""
+
+class ClickableLabel(QLabel):
+    clicked = Signal()
+
+    def __init__(self, text='', parent=None):
+        super().__init__(text, parent)
+        self.setCursor(Qt.PointingHandCursor)
+        self.setStyleSheet("color: blue; text-decoration: underline;")
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+
+
 class Ui_Form(object):
     Rname = ""
     Rsurname = ""
@@ -123,7 +138,8 @@ class Ui_Form(object):
 "background-color: rgb(255, 255, 255);\n"
 "color: rgb(255, 255, 255);\n"
 "")
-        self.go_back_label = QLabel(self.widget_2)
+        self.go_back_label = ClickableLabel("go_back_label", parent=self.widget_2)
+        #self.go_back_label = QLabel(self.widget_2)
         self.go_back_label.setObjectName(u"go_back_label")
         self.go_back_label.setGeometry(QRect(80, 470, 121, 16))
         self.go_back_label.setStyleSheet(u"color: rgb(255, 255, 255);")

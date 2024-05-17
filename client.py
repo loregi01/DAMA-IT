@@ -42,6 +42,7 @@ class SignIn(QMainWindow):
         self.setup_ui()
         self.ui.confirm_button.clicked.connect(self.send_credentials)
         #self.ui.confirm_button.clicked.connect(self.on_confirm_clicked)
+        self.ui.go_back_label.mousePressEvent = self.on_go_back_label_clicked
 
     def new_window(self):
         self.close()
@@ -53,6 +54,18 @@ class SignIn(QMainWindow):
     def on_confirm_clicked(self):
         print("Confirm button clicked")
         self.new_window()
+
+    def main_window(self):
+        self.close()
+        #self.new_window_instance = SignIn()
+        #global signup_window
+        #self.signup_window = new_window_instance  
+        self.signup_window = MainWindow()  
+        self.signup_window.show()
+
+    def on_go_back_label_clicked(self, event):
+        print("Sign In label clicked")
+        self.main_window()
 
     def setup_ui(self):
         self.ui = Ui_Form()  # Inizializza Ui_Form
@@ -137,7 +150,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.new_window_instance = None
-        sio.connect('http://127.0.0.1:5000')
+        if not sio.connected:
+            sio.connect('http://127.0.0.1:5000')
 
         # Inizializza l'interfaccia utente generata da Qt Designer
         self.ui = Ui_MainWindow()
