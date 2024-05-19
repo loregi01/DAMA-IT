@@ -70,7 +70,7 @@ def handle_login_credentials (data):
     result = cursor.fetchall()    
 
     if result:
-        socketio.emit('login_success', room = request.sid)   
+        socketio.emit('login_success',result, room = request.sid)   
     else:
         socketio.emit('login_unsuccess', room = request.sid) 
 
@@ -85,6 +85,15 @@ def handle_connect():
     #print(f"{name} connected with level {level}")
 
     #try_match_clients(client_id)
+
+@socketio.on('Statistics')
+def send_statistics (username):
+    cursor.execute(f'SELECT * FROM user WHERE Username="{username}"')
+    result = cursor.fetchall()
+    stat_id = result[0][7]
+    cursor.execute(f'SELECT * FROM statistic WHERE StatisticID="{stat_id}"')
+    result = cursor.fetchall()
+    socketio.emit('statistic', result, room = request.sid) 
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)

@@ -1,6 +1,7 @@
 from views.login_page import Ui_MainWindow
 from views.sign_up_page import Ui_Form
 from views.home_page import Ui_Form as Ui_HomePage
+from views.statistics_page import Ui_Form as Ui_StatisticsPage
 from views.board import Board
 import views.sign_up_page
 import views.login_page
@@ -20,6 +21,16 @@ import socketio
 sio = socketio.Client()
 
 Uname = ""
+
+#data logged user
+firstName = ""
+surname = ""
+email = ""
+username = ""
+birthdate = ""
+
+#User stats
+stats = None
 
 #@sio.event
 #def connect():
@@ -146,6 +157,7 @@ class MainWindow(QMainWindow):
     signup_confirmed = Signal(QMainWindow)
     login_success_signal = Signal(QMainWindow)
     login_unsuccess = Signal(QMainWindow)
+    statistic_view = Signal(QMainWindow)
 
     def __init__(self):
         super().__init__()
@@ -166,7 +178,16 @@ class MainWindow(QMainWindow):
         #signal setup
         self.signup_confirmed.connect(self.on_confirm_clicked)
         self.login_success_signal.connect(self.on_confirm_clicked)
-        self.login_unsuccess.connect(self.on_login_unsuccess)
+        self.login_unsuccess.connect(self.on_login_unsuccess)   
+        self.statistic_view.connect(self.on_statistic_view)    
+
+    def on_statistic_view (self):
+        self.statistic_window(self.homepage_window)
+
+    def statistic_window (self, old_window):
+        old_window.close()
+        self.statisticspage_window = StatisticsPage()
+        self.statisticspage_window.show()
 
     def on_login_unsuccess(self):
         email_field = views.login_page.email
@@ -182,7 +203,8 @@ class MainWindow(QMainWindow):
         #homepage_window = self.new_window_instance
         self.homepage_window = HomePage() 
         self.homepage_window.show()
-        self.homepage_window.user_field.setText(f"Hi, {Uname}")
+        self.homepage_window.user_field.setStyleSheet("color: white; font-size: 18px;")
+        self.homepage_window.user_field.setText(f"Hi, {username}")
 
     def on_confirm_clicked(self, old_window):
         print("Confirm button clicked from MainWindow after comunication with server")
@@ -216,6 +238,12 @@ class HomePage(QMainWindow):
         super().__init__()
         self.setup_ui()
         self.ui.pushButton.clicked.connect(self.game_start)
+        self.ui.pushButton_6.clicked.connect(self.statistics_page)
+        self.statisticspage_window = None
+
+    def statistics_page (self):
+        #Retrieve data for the page
+        sio.emit('Statistics', username)
 
     def setup_ui(self):
         self.ui = Ui_HomePage()  # Inizializza Ui_Form
@@ -234,11 +262,45 @@ class HomePage(QMainWindow):
         self.board.show()
 
 
+class StatisticsPage(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        total_games=stats[0][1]
+        total_wins=stats[0][2]
+        elo=stats[0][4]
+        level=stats[0][5]
+        self.ui.info_label.setText(f"Total Games: {total_games}\nTotal Wins: {total_wins}\nELO: {elo}\nLevel: {level}")
+
+
 @sio.event
-def login_success():
+def statistic(data):
+    print('Statistics')
+    global stats
+    stats = data 
+    print(data)
+    window.statistic_view.emit(window)
+
+@sio.event
+def login_success(data):
     print('Login Success')
     #global Uname
     #Uname = data
+    print(data[0])
+    global firstName
+    firstName = data[0][1]
+    global surname
+    surname = data[0][2]
+    global email
+    email = data[0][3]
+    global username
+    username = data[0][5]
+    global birthdate
+    birthdate = data[0][6]
     window.login_success_signal.emit(window)
 
 @sio.event
