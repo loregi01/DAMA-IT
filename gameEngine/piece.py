@@ -10,6 +10,14 @@ class Piece:
         self._pieceBoard = board
         self.end_up_point = []
 
+    def to_dict(self):
+        return {
+            'x': self._x,
+            'y': self._y,
+            'white': self._white,
+            'king': self._king,
+            'end_up_point': self.end_up_point
+        }
     def white(self) -> bool:
         return self._white
 

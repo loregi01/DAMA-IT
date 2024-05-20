@@ -1,6 +1,8 @@
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QMessageBox
 from PySide6.QtGui import QColor#, QTextStream
 from PySide6.QtCore import Qt, QRectF, QFile, QObject, Signal, Slot
+import json
+import time
 
 
 class Board(QGraphicsView):
@@ -18,6 +20,7 @@ class Board(QGraphicsView):
         self._playerIsWhite = playerIsWhite
         self._game = None
         self._col = ""
+        self._numberOfMoves = 0
 
         if self._gMode == "HUMAN_VS_HUMAN":
             if (turn and self._playerIsWhite) or (not turn and not self._playerIsWhite):
@@ -140,7 +143,7 @@ class Board(QGraphicsView):
             if self._game.isThinking():
                 return
 
-
+            self._game.eat_rules()
             multiple_eat = False  
             boolMove, multiple_eat = self._game.move(x0, y0, x1, y1, multiple_eat)
 
@@ -151,54 +154,49 @@ class Board(QGraphicsView):
             #self.win_lose_mex()
 
             if multiple_eat:
+                self._numberOfMoves = self._numberOfMoves + 1
                 return
 
             #self._game.eat_rules()
             self._col = "Your turn"
+            self._game._myTurn = False
 
             if self._gMode == "HUMAN_VS_AI" and not self._game.myTurn():
                 #MainWindow.instance().update_toolbar(False, False)
                 self._game._isThinking = True
                 print("Opponent is thinking...")
                 #self._col = "Opponent is thinking..."
-                #self.sio.emit('moves', self._game.pieceBoard())
-
-                #0=white, 1=black, 2=white_king, 3=black_king, 4=empty
-                position_piece = [[None for _ in range(self._n)] for _ in range(self._n)]
-                i = 0
-                j = 0
-                for i in range(self._n):
-                    for j in range(self._n):
-                        if self._game.pieceBoard()[i][j] != None:
-                            piece = self._game.pieceBoard()[i][j]
-                            if piece.white() and not piece.king():
-                                position_piece[i][j] = 0 if self._playerIsWhite else 1
-                            elif not piece.white() and not piece.king():
-                                position_piece[i][j] = 1 if self._playerIsWhite else 0
-                            elif piece.white() and piece.king():
-                                position_piece[i][j] = 2 if self._playerIsWhite else 3
-                            elif not piece.white() and piece.king():
-                                position_piece[i][j] = 3 if self._playerIsWhite else 2
-                        else:
-                            position_piece[i][j] = 4
-                self.sio.emit('moves', position_piece)
+                moveDid = self._game._moves[-(self._numberOfMoves + 1):]
+                for move in moveDid:
+                    move._x0 = 7 - move._x0
+                    move._y0 = 7 - move._y0
+                    move._x1 = 7 - move._x1
+                    move._y1 = 7 - move._y1
+                moves_dict_list = [move.to_dict_coordinates() for move in moveDid]
+                # Convert each Move object to a dictionary
+                #moves_dict_list = [move.to_dict() for move in moveDid]
+                # Serialize the list of dictionaries to a JSON string
+                moves_json = json.dumps(moves_dict_list, indent=4)
+                self._numberOfMoves = 0
+                #time.sleep(1)
+                self.sio.emit('moves', moves_json)
+            
                 
 
-    '''def updateBoard_fromOpponent(self, opponent_board):
-        i = 0
-        j = 0
-        for i in range(self._n):
-            for j in range(self._n):
-                piece = self._game.pieceBoard()[i][j]
-                if (piece.white() and )
-                if piece.white() and not piece.king():
-                    position_piece[i][j] = 0 if self._playerIsWhite else 1
-                elif not piece.white() and not piece.king():
-                    position_piece[i][j] = 1 if self._playerIsWhite else 0
-                elif piece.white() and piece.king():
-                    position_piece[i][j] = 2 if self._playerIsWhite else 3
-                elif not piece.white() and piece.king():
-                    position_piece[i][j] = 3 if self._playerIsWhite else 2'''
+    def updateBoard_fromOpponent(self, o_moves):
+        time.sleep(1)
+        #opponent_moves = [[move['x0'], move['y0'], move['x1'], move['y1']] for move in o_moves]
+        opponent_moves = json.loads(o_moves)
+        print(opponent_moves)
+        self._game._forced_moves.clear()
+        #opponent_moves = o_moves.split(': ', 1)[1]
+        for move in opponent_moves:
+            multiple_eat = False  
+            boolMove, multiple_eat = self._game.move(move['x0'], move['y0'], move['x1'], move['y1'], multiple_eat)
+        
+        self.updateBoard()
+        self._game._myTurn = True
+        self._game._isThinking = False
 
     def updateBoard(self):
         from views.cell import Cell

@@ -125,7 +125,8 @@ def handle_message(data):
             sender_name = connected_clients[sender_id]['name']
             #receiver_name = connected_clients[receiver_id]['name']
         
-            socketio.emit('moves', f'{sender_name}: {data}', room=receiver_id)
+            #socketio.emit('moves', f'{sender_name}: {data}', room=receiver_id)
+            socketio.emit('moves', data, room=receiver_id)
             #socketio.emit('message', f'{sender_name}: {data}', room=sender_id)
 
 @socketio.on('Statistics')

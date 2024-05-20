@@ -12,6 +12,24 @@ class Move:
         self._eaten = eaten
         self._multiple_eat = multiple_eat
 
+    def to_dict(self):
+        return {
+            'x0': self._x0,
+            'y0': self._y0,
+            'x1': self._x1,
+            'y1': self._y1,
+            'moved': self._moved.to_dict() if self._moved else None,
+            'eaten': self._eaten.to_dict() if self._eaten else None,
+            'multiple_eat': self._multiple_eat
+        }
+    def to_dict_coordinates(self):
+        return {
+            'x0': self._x0,
+            'y0': self._y0,
+            'x1': self._x1,
+            'y1': self._y1
+        }
+
 
 class Game:
     def __init__(self, difficulty: int, first_player: bool, up: bool, turn: bool):

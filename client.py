@@ -248,9 +248,9 @@ class HomePage(QMainWindow):
     def on_update_board(self, data):
         #self.board._game._pieceBoard = data
         print("From on_update_board", data)
-        self.board._game._isThinking = False
-        self.board._game._myTurn = True
-        #self.board.updateBoard_fromOpponent()
+        #self.board._game._isThinking = False
+        #self.board._game._myTurn = True
+        self.board.updateBoard_fromOpponent(data)
 
     def setup_ui(self):
         self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
