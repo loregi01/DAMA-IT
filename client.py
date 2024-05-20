@@ -2,6 +2,7 @@ from views.login_page import Ui_MainWindow
 from views.sign_up_page import Ui_Form
 from views.home_page import Ui_Form as Ui_HomePage
 from views.statistics_page import Ui_Form as Ui_StatisticsPage
+from views.account_page import Ui_Form as Ui_AccountPage
 from views.board import Board
 import views.sign_up_page
 import views.login_page
@@ -158,6 +159,7 @@ class MainWindow(QMainWindow):
     login_success_signal = Signal(QMainWindow)
     login_unsuccess = Signal(QMainWindow)
     statistic_view = Signal(QMainWindow)
+    account_view = Signal(QMainWindow)
 
     def __init__(self):
         super().__init__()
@@ -180,14 +182,23 @@ class MainWindow(QMainWindow):
         self.login_success_signal.connect(self.on_confirm_clicked)
         self.login_unsuccess.connect(self.on_login_unsuccess)   
         self.statistic_view.connect(self.on_statistic_view)    
+        self.account_view.connect(self.on_account_view)
 
     def on_statistic_view (self):
         self.statistic_window(self.homepage_window)
+
+    def on_account_view(self):
+        self.account_window(self.homepage_window)
 
     def statistic_window (self, old_window):
         old_window.close()
         self.statisticspage_window = StatisticsPage()
         self.statisticspage_window.show()
+
+    def account_window (self, old_window):
+        old_window.close()
+        self.account_page_window = AccountPage()
+        self.account_page_window.show()
 
     def on_login_unsuccess(self):
         email_field = views.login_page.email
@@ -239,11 +250,25 @@ class HomePage(QMainWindow):
         self.setup_ui()
         self.ui.pushButton.clicked.connect(self.game_start)
         self.ui.pushButton_6.clicked.connect(self.statistics_page)
+        self.ui.pushButton_5.clicked.connect(self.account_page)
         self.statisticspage_window = None
+        self.accountpage_window = None
+
+    def setup_ui(self):
+        self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        total_games=stats[0][1]
+        total_wins=stats[0][2]
+        elo=stats[0][4]
+        level=stats[0][5]
+        self.ui.info_label.setText(f"Total Games: {total_games}\nTotal Wins: {total_wins}\nELO: {elo}\nLevel: {level}")
 
     def statistics_page (self):
         #Retrieve data for the page
         sio.emit('Statistics', username)
+
+    def account_page (self):
+        sio.emit('Account', username)
 
     def setup_ui(self):
         self.ui = Ui_HomePage()  # Inizializza Ui_Form
@@ -276,6 +301,21 @@ class StatisticsPage(QMainWindow):
         level=stats[0][5]
         self.ui.info_label.setText(f"Total Games: {total_games}\nTotal Wins: {total_wins}\nELO: {elo}\nLevel: {level}")
 
+class AccountPage(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.ui = Ui_AccountPage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui.label.setText(f"{firstName}")
+        self.ui.label_2.setText(f"{surname}")
+        level = stats[0][5]
+        elo = stats[0][4]
+        self.ui.label_3.setText(f"{level}")
+        self.ui.label_4.setText(f"{elo}")
+
 
 @sio.event
 def statistic(data):
@@ -284,6 +324,13 @@ def statistic(data):
     stats = data 
     print(data)
     window.statistic_view.emit(window)
+
+@sio.event
+def account(data):
+    print('Account')
+    global stats
+    stats = data
+    window.account_view.emit(window)
 
 @sio.event
 def login_success(data):
