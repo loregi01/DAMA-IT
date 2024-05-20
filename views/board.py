@@ -4,9 +4,12 @@ from PySide6.QtCore import Qt, QRectF, QFile, QObject, Signal, Slot
 
 
 class Board(QGraphicsView):
+    send_move = Signal(QGraphicsView)
 
-    def __init__(self, mode, difficulty, playerIsWhite, up, turn):
+    def __init__(self, mode, difficulty, playerIsWhite, up, turn, s):
         super().__init__()
+        #self.send_move.connect(self.on_account_view)
+        self.sio = s
         self._n = 8
         self._scene = None
         self._cells = None
@@ -97,7 +100,6 @@ class Board(QGraphicsView):
                 #self._game.eat_rules()
                 boolMove, multiple_eat = self._game.move(x0, y0, x1, y1, multiple_eat)
 
-                print(boolMove)
                 if not boolMove:
                     return
 
@@ -110,9 +112,10 @@ class Board(QGraphicsView):
 
                 self._game.eat_rules()
                 self._col = "Black turn"
+                #self.sio.emit('moves', self._game.pieceBoard())
 
             elif ((not self._game.myTurn() and self._playerIsWhite) or (self._game.myTurn() and not self._playerIsWhite)) and (self._cells[y0][x0]._content == Cell.PIECE_B or self._cells[y0][x0]._content == Cell.P_DAMA_B):
-                
+            
                 multiple_eat = False  # Using list to mimic pass by reference
                 #self._game.eat_rules()
                 boolMove, multiple_eat = self._game.move(x0, y0, x1, y1, multiple_eat)
@@ -130,33 +133,72 @@ class Board(QGraphicsView):
                 self._game.eat_rules()
                 self._col = "White turn"
 
-        '''elif self._gMode == HUMAN_VS_AI:
+        elif self._gMode == "HUMAN_VS_AI":
             if self._game.myTurn() and not self.valid_selection(x0, y0):
                 return
 
             if self._game.isThinking():
                 return
 
-            MainWindow.instance().update_toolbar(True, True)
 
-            multiple_eat = [False]  # Using list to mimic pass by reference
-            if not self._game.move(x0, y0, x1, y1, multiple_eat):
+            multiple_eat = False  
+            boolMove, multiple_eat = self._game.move(x0, y0, x1, y1, multiple_eat)
+
+            if not boolMove:
                 return
 
             self.updateBoard()
-            self.win_lose_mex()
+            #self.win_lose_mex()
 
-            if multiple_eat[0]:
-                MainWindow.instance().update_toolbar(False, False)
+            if multiple_eat:
                 return
 
-            self._game.eat_rules()
+            #self._game.eat_rules()
             self._col = "Your turn"
 
-            if self._gMode == HUMAN_VS_AI and not self._game.myTurn():
-                MainWindow.instance().update_toolbar(False, False)
-                self._col = "AI is thinking..."
-                self._game.start()'''
+            if self._gMode == "HUMAN_VS_AI" and not self._game.myTurn():
+                #MainWindow.instance().update_toolbar(False, False)
+                self._game._isThinking = True
+                print("Opponent is thinking...")
+                #self._col = "Opponent is thinking..."
+                #self.sio.emit('moves', self._game.pieceBoard())
+
+                #0=white, 1=black, 2=white_king, 3=black_king, 4=empty
+                position_piece = [[None for _ in range(self._n)] for _ in range(self._n)]
+                i = 0
+                j = 0
+                for i in range(self._n):
+                    for j in range(self._n):
+                        if self._game.pieceBoard()[i][j] != None:
+                            piece = self._game.pieceBoard()[i][j]
+                            if piece.white() and not piece.king():
+                                position_piece[i][j] = 0 if self._playerIsWhite else 1
+                            elif not piece.white() and not piece.king():
+                                position_piece[i][j] = 1 if self._playerIsWhite else 0
+                            elif piece.white() and piece.king():
+                                position_piece[i][j] = 2 if self._playerIsWhite else 3
+                            elif not piece.white() and piece.king():
+                                position_piece[i][j] = 3 if self._playerIsWhite else 2
+                        else:
+                            position_piece[i][j] = 4
+                self.sio.emit('moves', position_piece)
+                
+
+    '''def updateBoard_fromOpponent(self, opponent_board):
+        i = 0
+        j = 0
+        for i in range(self._n):
+            for j in range(self._n):
+                piece = self._game.pieceBoard()[i][j]
+                if (piece.white() and )
+                if piece.white() and not piece.king():
+                    position_piece[i][j] = 0 if self._playerIsWhite else 1
+                elif not piece.white() and not piece.king():
+                    position_piece[i][j] = 1 if self._playerIsWhite else 0
+                elif piece.white() and piece.king():
+                    position_piece[i][j] = 2 if self._playerIsWhite else 3
+                elif not piece.white() and piece.king():
+                    position_piece[i][j] = 3 if self._playerIsWhite else 2'''
 
     def updateBoard(self):
         from views.cell import Cell

@@ -18,7 +18,10 @@ class Game:
         self._n = 8
         self._pieceBoard = [[None for _ in range(self._n)] for _ in range(self._n)]
         self._myTurn = first_player
-        self._isThinking = False
+        if self._myTurn == False:
+            self._isThinking = True
+        else:
+            self._isThinking = False
         #self._difficulty = difficulty
         self._moves = []
         self._forced_moves = []

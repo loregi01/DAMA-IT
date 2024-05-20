@@ -48,8 +48,7 @@ class SignIn(QMainWindow):
     def new_window(self):
         self.close()
         self.new_window_instance = HomePage()
-        global homepage_window
-        homepage_window = self.new_window_instance  
+        window.homepage_window = self.new_window_instance  
         self.new_window_instance.show()
 
     def on_confirm_clicked(self):
@@ -234,6 +233,7 @@ class MainWindow(QMainWindow):
 
 class HomePage(QMainWindow):
     user_field = None
+    update_board = Signal(QMainWindow)
     def __init__(self):
         super().__init__()
         self.setup_ui()
@@ -242,6 +242,15 @@ class HomePage(QMainWindow):
         self.ui.pushButton_5.clicked.connect(self.account_page)
         self.statisticspage_window = None
         self.accountpage_window = None
+
+        self.update_board.connect(self.on_update_board)
+
+    def on_update_board(self, data):
+        #self.board._game._pieceBoard = data
+        print("From on_update_board", data)
+        self.board._game._isThinking = False
+        self.board._game._myTurn = True
+        #self.board.updateBoard_fromOpponent()
 
     def setup_ui(self):
         self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
@@ -266,12 +275,18 @@ class HomePage(QMainWindow):
     
     def game_start(self):
         window.homepage_window.close()
-        mode = "HUMAN_VS_HUMAN"
+        mode = "HUMAN_VS_AI"
         difficulty = 0
-        playerIsWhite = True
+        playerIsWhite = input("Enter color white or black (true or false): ")
+        # Conversione in variabile booleana
+        if playerIsWhite.lower() == 'true':
+            playerIsWhite = True
+        elif playerIsWhite.lower() == 'false':
+            playerIsWhite = False
         up = False
         turn = False
-        self.board = Board(mode, difficulty, playerIsWhite, up, turn)  # Create an instance of the Board class
+        connect_with_opponent()
+        self.board = Board(mode, difficulty, playerIsWhite, up, turn, sio)  # Create an instance of the Board class
         self.board.setFixedSize(QSize(900, 600))
         self.board.show()
 
@@ -379,6 +394,40 @@ def connect():
     #settings = {'name': name, 'level': lv}
     sio.emit('connect_client')
     print('Connected to server')
+
+
+def update(data):
+    print("UPDATE")
+    #window.homepage_window.update_board.emit(data)
+    window.homepage_window.on_update_board(data)
+
+def connect_with_opponent():
+    name = username
+    lv = 10
+    elo = 60
+    #lv = stats[0][5]
+    #elo = stats[0][4]
+    
+    settings = {'name': name, 'level': lv, 'elo': elo}
+    sio.emit('connect_match', settings)
+    print('Connected to server')
+
+@sio.event
+def moves(data):
+    print(data)
+    update(data)
+
+'''@sio.event
+def starting():
+    #print(data)
+    send_messages()'''
+
+@sio.event
+def matched(data):
+    print(data)
+    # Start the thread for sending messages ????
+    #send_messages()
+
 
 if __name__ == "__main__":
 

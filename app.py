@@ -72,6 +72,62 @@ def handle_login_credentials (data):
 def handle_connect():
     client_id = request.sid
 
+connected_clients = {}
+matched_clients = {}
+@socketio.on('connect_match')
+def handle_connect_match(settings):
+    client_id = request.sid
+    name = settings['name']
+    level = settings['level']
+    elo = settings['elo']
+
+    connected_clients[client_id] = {'name': name, 'level': int(level), 'elo': int(elo)}
+    print(f"{name} connected with level {level}")
+
+    try_match_clients(client_id)
+
+def try_match_clients(sender_id):
+    sender_data = connected_clients.get(sender_id)
+    sender_name = sender_data['name']
+    sender_lv = sender_data['level']
+    sender_elo = sender_data['elo']
+
+    for client_id, client_data in connected_clients.items():
+        if client_data['name'] != sender_name:
+            if sender_elo - 50 <= client_data['level'] <= sender_elo + 50:
+
+                matched_clients[sender_id] = client_id
+                matched_clients[client_id] = sender_id
+                
+                join_room(sender_id)
+                #join_room(client_id)
+
+                socketio.emit('matched', f"{sender_name} is matched with {client_data['name']} in room {sender_id}", room=sender_id)
+                socketio.emit('matched', f"{client_data['name']} is matched with {sender_name} in room {sender_id}", room=client_id)
+                
+                room_id.append(sender_id)
+
+                #first that can send message
+                #socketio.emit('starting', room=sender_id)
+                break
+
+@socketio.on('moves')
+def handle_message(data):
+    sender_id = request.sid
+    receiver_id = matched_clients.get(sender_id)
+
+    #if data == 'exit':
+    #    socketio.emit('disconnect', room=sender_id)
+    #    socketio.emit('disconnect', room=receiver_id)
+    #else:
+    if receiver_id:
+        if receiver_id != sender_id:
+            sender_name = connected_clients[sender_id]['name']
+            #receiver_name = connected_clients[receiver_id]['name']
+        
+            socketio.emit('moves', f'{sender_name}: {data}', room=receiver_id)
+            #socketio.emit('message', f'{sender_name}: {data}', room=sender_id)
+
 @socketio.on('Statistics')
 def send_statistics (username):
     cursor.execute(f'SELECT * FROM user WHERE Username="{username}"')
