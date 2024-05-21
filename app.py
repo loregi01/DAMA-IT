@@ -147,5 +147,11 @@ def send_stats_for_account (username):
     result = cursor.fetchall()
     socketio.emit('account', result, room = request.sid) 
 
+@socketio.on('GlobalChamp')
+def sendGlobalChamp():
+    cursor.execute(f'SELECT Username,Elo FROM user JOIN statistic ON (Statistic=StatisticID)')
+    result = cursor.fetchall()
+    socketio.emit('globalchamp', result)
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)

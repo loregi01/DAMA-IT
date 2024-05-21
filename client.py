@@ -3,6 +3,8 @@ from views.sign_up_page import Ui_Form
 from views.home_page import Ui_Form as Ui_HomePage
 from views.statistics_page import Ui_Form as Ui_StatisticsPage
 from views.account_page import Ui_Form as Ui_AccountPage
+from views.local_championship import Ui_Form as Ui_LocalChampionshipPage
+from views.global_championship import Ui_Form as Ui_GlobalChampionshipPage
 from views.board import Board
 import views.sign_up_page
 import views.login_page
@@ -292,12 +294,35 @@ class HomePage(QMainWindow):
         self.board.show()
 
 
-class StatisticsPage(QMainWindow):
+class LocalChampionshipPage(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
 
     def setup_ui(self):
+        self.ui = Ui_LocalChampionshipPage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+
+class GlobalChampionshipPage(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.ui = Ui_GlobalChampionshipPage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+
+
+class StatisticsPage(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setup_ui()
+        self.ui.local_championship_button.clicked.connect(self.localchampionshippage)
+        self.ui.global_championship_button.clicked.connect(self.globalchampionshippage)
+
+    def setup_ui(self):
+        self.localchampionshippagewindow = None
+        self.globalchampionshippagewindow = None
         self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
         total_games=stats[0][1]
@@ -305,6 +330,14 @@ class StatisticsPage(QMainWindow):
         elo=stats[0][4]
         level=stats[0][5]
         self.ui.info_label.setText(f"Total Games: {total_games}\nTotal Wins: {total_wins}\nELO: {elo}\nLevel: {level}")
+
+    def localchampionshippage(self):
+        self.close()
+        self.localchampionshippagewindow = LocalChampionshipPage()
+        self.localchampionshippagewindow.show()
+
+    def globalchampionshippage(self):
+        sio.emit('GlobalChamp')
 
 class AccountPage(QMainWindow):
     def __init__(self):
@@ -428,6 +461,11 @@ def matched(data):
     print(data)
     # Start the thread for sending messages ????
     #send_messages()
+@sio.event
+def globalchamp(data):
+    sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
+    print(sorted_data)
+
 
 
 if __name__ == "__main__":
