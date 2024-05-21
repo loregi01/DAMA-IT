@@ -9,7 +9,8 @@ from views.board import Board
 import views.sign_up_page
 import views.login_page
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
-from PySide6.QtCore import Signal, QSize
+from PySide6.QtCore import Signal, QSize, Qt
+from PySide6.QtGui import QPainter, QColor, QFont
 import sys
 import hashlib
 import time
@@ -37,6 +38,7 @@ stats = None
 
 authenticated = False
 Semail = None
+globalChampList = []
 
 class SignIn(QMainWindow):
     def __init__(self):
@@ -150,6 +152,7 @@ class MainWindow(QMainWindow):
     login_unsuccess = Signal(QMainWindow)
     statistic_view = Signal(QMainWindow)
     account_view = Signal(QMainWindow)
+    glob_champ_view = Signal(QMainWindow)
 
     def __init__(self):
         super().__init__()
@@ -174,6 +177,14 @@ class MainWindow(QMainWindow):
         self.login_unsuccess.connect(self.on_login_unsuccess)   
         self.statistic_view.connect(self.on_statistic_view)    
         self.account_view.connect(self.on_account_view)
+        self.glob_champ_view.connect(self.on_glob_champ_view)
+
+    def on_glob_champ_view(self):
+        #self.statisticspage_window.close()
+        print("CIAO")
+        #print(data)
+        self.globalchampionshippagewindow = GlobalChampionshipPage()
+        self.globalchampionshippagewindow.show()
 
     def on_statistic_view (self):
         self.statistic_window(self.homepage_window)
@@ -303,26 +314,68 @@ class LocalChampionshipPage(QMainWindow):
         self.ui = Ui_LocalChampionshipPage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
 
+class RectWidget(QWidget):
+    def __init__(self, text, parent=None):
+        super().__init__(parent)
+        self.text = text
+        self.initUI()
+        
+    def initUI(self):
+        # Imposta un layout per il widget rettangolo
+        layout = QVBoxLayout()
+        label = QLabel(self.text)
+        label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(label)
+        self.setLayout(layout)
+        self.setFixedSize(200, 100)  # Dimensioni fisse del rettangolo
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        rect = self.rect()
+        painter.setBrush(QColor(200, 200, 255))
+        painter.drawRect(rect)
+
 class GlobalChampionshipPage(QMainWindow):
+    #update_champ = Signal(QMainWindow)
+        
     def __init__(self):
         super().__init__()
         self.setup_ui()
+        self.container = QWidget()
+        self.layout = QVBoxLayout()
+        self.on_update_champ(globalChampList)
+        #self.update_champ.connect(self.on_update_champ)
 
     def setup_ui(self):
         self.ui = Ui_GlobalChampionshipPage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+    
+    def on_update_champ(self, data):
+        print(data)
+        container = QWidget()
+        layout = QVBoxLayout()
+
+        # Aggiungi i rettangoli al layout
+        for value in data[0]:
+            rect_widget = RectWidget(value)
+            layout.addWidget(rect_widget)
+
+        container.setLayout(layout)
+        self.ui.scrollArea.setWidget(container)
+        self.ui.scrollArea.setWidgetResizable(True)
 
 
 class StatisticsPage(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
+        self.localchampionshippagewindow = None
+        self.globalchampionshippagewindow = None
         self.ui.local_championship_button.clicked.connect(self.localchampionshippage)
         self.ui.global_championship_button.clicked.connect(self.globalchampionshippage)
 
     def setup_ui(self):
-        self.localchampionshippagewindow = None
-        self.globalchampionshippagewindow = None
         self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
         total_games=stats[0][1]
@@ -465,6 +518,10 @@ def matched(data):
 def globalchamp(data):
     sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
     print(sorted_data)
+    global globalChampList
+    globalChampList = sorted_data
+    window.glob_champ_view.emit(window)
+    #window.statisticspage_window.globalchampionshippagewindow.on_update_champ(sorted_data)
 
 
 
