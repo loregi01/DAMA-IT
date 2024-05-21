@@ -183,6 +183,7 @@ class MainWindow(QMainWindow):
         #self.statisticspage_window.close()
         print("CIAO")
         #print(data)
+        self.statisticspage_window.close()
         self.globalchampionshippagewindow = GlobalChampionshipPage()
         self.globalchampionshippagewindow.show()
 
@@ -315,26 +316,25 @@ class LocalChampionshipPage(QMainWindow):
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
 
 class RectWidget(QWidget):
-    def __init__(self, text, parent=None):
-        super().__init__(parent)
-        self.text = text
-        self.initUI()
-        
-    def initUI(self):
-        # Imposta un layout per il widget rettangolo
-        layout = QVBoxLayout()
-        label = QLabel(self.text)
-        label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(label)
-        self.setLayout(layout)
-        self.setFixedSize(200, 100)  # Dimensioni fisse del rettangolo
+    def __init__(self, username, elo):
+        super().__init__()
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        rect = self.rect()
-        painter.setBrush(QColor(200, 200, 255))
-        painter.drawRect(rect)
+        # Create layout
+        layout = QVBoxLayout()
+
+        # Create and style labels
+        username_label = QLabel(f"Username: {username}\nELO: {elo}")
+        username_label.setStyleSheet("color: white;")
+        layout.addWidget(username_label)
+
+        # Set widget style
+        self.setAutoFillBackground(True)
+        self.setStyleSheet("background-color: black; border-radius: 10px; border: 2px solid white;")
+
+        # Set layout to widget
+        self.setLayout(layout)
+
+        self.setFixedSize(530, 100)
 
 class GlobalChampionshipPage(QMainWindow):
     #update_champ = Signal(QMainWindow)
@@ -355,10 +355,13 @@ class GlobalChampionshipPage(QMainWindow):
         print(data)
         container = QWidget()
         layout = QVBoxLayout()
+        layout.setAlignment(Qt.Alignment.AlignTop)
+        layout.setSpacing(0)
 
+        print(data[0])
         # Aggiungi i rettangoli al layout
-        for value in data[0]:
-            rect_widget = RectWidget(value)
+        for value in data:
+            rect_widget = RectWidget(value[0], value[1])
             layout.addWidget(rect_widget)
 
         container.setLayout(layout)
