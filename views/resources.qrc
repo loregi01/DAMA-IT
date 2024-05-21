@@ -6,5 +6,6 @@
     <file>graphics/arrow.jpg</file>
     <file>graphics/chat.jpg</file>
     <file>graphics/friends.jpg</file>
+    <file>graphics/arrow.png</file>
   </qresource>
 </RCC>
