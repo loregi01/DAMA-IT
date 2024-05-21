@@ -153,7 +153,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.new_window_instance = None
         if not sio.connected:
-            sio.connect('http://127.0.0.1:5000')
+            #sio.connect('http://127.0.0.1:5000')
+            sio.connect('http://172.20.10.2:5000')
 
         # Inizializza l'interfaccia utente generata da Qt Designer
         self.ui = Ui_MainWindow()

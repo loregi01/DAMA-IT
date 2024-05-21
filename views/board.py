@@ -172,8 +172,8 @@ class Board(QGraphicsView):
                     move._y0 = 7 - move._y0
                     move._x1 = 7 - move._x1
                     move._y1 = 7 - move._y1
-                moves_dict_list = [move.to_dict_coordinates() for move in moveDid]
                 # Convert each Move object to a dictionary
+                moves_dict_list = [move.to_dict_coordinates() for move in moveDid]
                 #moves_dict_list = [move.to_dict() for move in moveDid]
                 # Serialize the list of dictionaries to a JSON string
                 moves_json = json.dumps(moves_dict_list, indent=4)
