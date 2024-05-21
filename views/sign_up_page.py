@@ -9,6 +9,7 @@ from PySide6.QtCore import Qt, QUrl, QFileInfo, Signal
 from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
     QPushButton, QSizePolicy, QTextEdit, QWidget)
 
+
 RUsername = ""
 
 class ClickableLabel(QLabel):
