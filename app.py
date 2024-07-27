@@ -102,8 +102,12 @@ def try_match_clients(sender_id):
                 join_room(sender_id)
                 #join_room(client_id)
 
-                socketio.emit('matched', f"{sender_name} is matched with {client_data['name']} in room {sender_id}", room=sender_id)
-                socketio.emit('matched', f"{client_data['name']} is matched with {sender_name} in room {sender_id}", room=client_id)
+                socketio.emit('matched', "white", room=sender_id)
+                socketio.emit('matched', "black", room=client_id)
+                            
+
+                #socketio.emit('matched', f"{sender_name} is matched with {client_data['name']} in room {sender_id}", room=sender_id)
+                #socketio.emit('matched', f"{client_data['name']} is matched with {sender_name} in room {sender_id}", room=client_id)
                 
                 room_id.append(sender_id)
 

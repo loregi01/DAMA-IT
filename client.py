@@ -9,7 +9,7 @@ from views.board import Board
 import views.sign_up_page
 import views.login_page
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
-from PySide6.QtCore import Signal, QSize, Qt
+from PySide6.QtCore import Signal, QSize, Qt, QRect, Signal
 from PySide6.QtGui import QPainter, QColor, QFont
 import sys
 import hashlib
@@ -32,6 +32,7 @@ surname = ""
 email = ""
 username = ""
 birthdate = ""
+color = None
 
 #User stats
 stats = None
@@ -249,6 +250,7 @@ class MainWindow(QMainWindow):
 class HomePage(QMainWindow):
     user_field = None
     update_board = Signal(QMainWindow)
+
     def __init__(self):
         super().__init__()
         self.setup_ui()
@@ -292,16 +294,24 @@ class HomePage(QMainWindow):
         window.homepage_window.close()
         mode = "HUMAN_VS_AI"
         difficulty = 0
-        playerIsWhite = input("Enter color white or black (true or false): ")
+        #playerIsWhite = input("Enter color white or black (true or false): ")
         # Conversione in variabile booleana
-        if playerIsWhite.lower() == 'true':
-            playerIsWhite = True
-        elif playerIsWhite.lower() == 'false':
-            playerIsWhite = False
+        #if playerIsWhite.lower() == 'true':
+        #    playerIsWhite = True
+        #elif playerIsWhite.lower() == 'false':
+        #    playerIsWhite = False
         up = False
         turn = False
         connect_with_opponent()
-        self.board = Board(mode, difficulty, playerIsWhite, up, turn, sio)  # Create an instance of the Board class
+        global color
+        print("Color 1: ", color)
+
+        while color is None:
+            continue
+
+
+        print("Color 2: ", color)
+        self.board = Board(mode, difficulty, color, up, turn, sio)  # Create an instance of the Board class
         self.board.setFixedSize(QSize(900, 600))
         self.board.show()
 
@@ -515,6 +525,15 @@ def starting():
 @sio.event
 def matched(data):
     print(data)
+    global color
+    if data == "white":
+        print("IF")
+        color = True
+    else:
+        print("ELSE")
+        color = False
+    print("Color: ", color)
+    
     # Start the thread for sending messages ????
     #send_messages()
 @sio.event
