@@ -13,7 +13,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(900, 600)
-        MainWindow.setStyleSheet(u"background-image: url(:/newPrefix/graphics/background1.png);")
+        MainWindow.setStyleSheet(u"background-image: url(views/graphics/background1.png);")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.label = QLabel(self.centralwidget)
