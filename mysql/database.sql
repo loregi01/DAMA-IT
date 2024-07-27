@@ -64,6 +64,3 @@ CREATE TABLE play (
     FOREIGN KEY (Player1) REFERENCES user (UserID),
     FOREIGN KEY (Player2) REFERENCES user (UserID)
 );
-
-INSERT INTO statistic(TotGames, TotWins, TotDraw, Elo, SLevel) VALUES("10","5","2","2","1");
-INSERT INTO user(FirstName, Surname, Email, UPassword, Username, Birthdate, Statistic) VALUES ("Massimo","Mecella","mecella@taccitua.it", "dockermerda", "mmlover", "30/02/1400", 1);

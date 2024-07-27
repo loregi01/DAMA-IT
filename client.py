@@ -8,6 +8,7 @@ from views.global_championship import Ui_Form as Ui_GlobalChampionshipPage
 from views.board import Board
 import views.sign_up_page
 import views.login_page
+from views.waiting import Ui_MainWindow as Ui_WaitingWindow
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
 from PySide6.QtCore import Signal, QSize, Qt, QRect, Signal
 from PySide6.QtGui import QPainter, QColor, QFont
@@ -36,6 +37,7 @@ color = None
 
 #User stats
 stats = None
+openStatisticPage = False
 
 authenticated = False
 Semail = None
@@ -250,6 +252,7 @@ class MainWindow(QMainWindow):
 class HomePage(QMainWindow):
     user_field = None
     update_board = Signal(QMainWindow)
+    showBoard = Signal(QMainWindow)
 
     def __init__(self):
         super().__init__()
@@ -261,6 +264,7 @@ class HomePage(QMainWindow):
         self.accountpage_window = None
 
         self.update_board.connect(self.on_update_board)
+        self.showBoard.connect(self.on_showBoard)
 
     def on_update_board(self, data):
         #self.board._game._pieceBoard = data
@@ -292,29 +296,28 @@ class HomePage(QMainWindow):
     
     def game_start(self):
         window.homepage_window.close()
-        mode = "HUMAN_VS_AI"
-        difficulty = 0
-        #playerIsWhite = input("Enter color white or black (true or false): ")
-        # Conversione in variabile booleana
-        #if playerIsWhite.lower() == 'true':
-        #    playerIsWhite = True
-        #elif playerIsWhite.lower() == 'false':
-        #    playerIsWhite = False
-        up = False
-        turn = False
+
         connect_with_opponent()
+
+        self.close()
+        self.waitingpage = WaitingPage()
+        self.waitingpage.show()
+
+    def on_showBoard(self):
         global color
-        print("Color 1: ", color)
-
-        while color is None:
-            continue
-
-
-        print("Color 2: ", color)
-        self.board = Board(mode, difficulty, color, up, turn, sio)  # Create an instance of the Board class
+        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio)  # Create an instance of the Board class
         self.board.setFixedSize(QSize(900, 600))
+        self.waitingpage.close()
         self.board.show()
 
+class WaitingPage(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.ui = Ui_WaitingWindow()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
 
 class LocalChampionshipPage(QMainWindow):
     def __init__(self):
@@ -427,7 +430,10 @@ def statistic(data):
     global stats
     stats = data 
     print(data)
-    window.statistic_view.emit(window)
+    global openStatisticPage
+    if openStatisticPage == True:
+        window.statistic_view.emit(window)
+    openStatisticPage = True
 
 @sio.event
 def account(data):
@@ -452,6 +458,8 @@ def login_success(data):
     username = data[0][5]
     global birthdate
     birthdate = data[0][6]
+    global openStatisticPage
+    sio.emit('Statistics', username)
     window.login_success_signal.emit(window)
 
 @sio.event
@@ -503,10 +511,9 @@ def update(data):
 
 def connect_with_opponent():
     name = username
-    lv = 10
-    elo = 60
-    #lv = stats[0][5]
-    #elo = stats[0][4]
+    global stats
+    lv = stats[0][5]
+    elo = stats[0][4]
     
     settings = {'name': name, 'level': lv, 'elo': elo}
     sio.emit('connect_match', settings)
@@ -524,15 +531,12 @@ def starting():
 
 @sio.event
 def matched(data):
-    print(data)
     global color
     if data == "white":
-        print("IF")
         color = True
     else:
-        print("ELSE")
         color = False
-    print("Color: ", color)
+    window.homepage_window.showBoard.emit(window)
     
     # Start the thread for sending messages ????
     #send_messages()
