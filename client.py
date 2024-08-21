@@ -43,7 +43,9 @@ authenticated = False
 Semail = None
 globalChampList = []
 
-class SignIn(QMainWindow):
+currentpage = None
+
+class SignUp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.new_window_instance = None
@@ -54,9 +56,11 @@ class SignIn(QMainWindow):
 
     def new_window(self):
         self.close()
-        self.new_window_instance = HomePage()
-        window.homepage_window = self.new_window_instance  
-        self.new_window_instance.show()
+        window.show()
+        #self.new_window_instance = HomePage()
+        #self.new_window_instance = MainWindow()
+        #window.homepage_window = self.new_window_instance  
+        #self.new_window_instance.show()
 
     def on_confirm_clicked(self):
         print("Confirm button clicked")
@@ -140,7 +144,12 @@ class SignIn(QMainWindow):
 
         data = {'name': name, 'surname': surname, 'email': email, 'password': password, 'username': username, 'birthdate': birthdate}
         print(f"My credentials sent... name:{name}, surname:{surname}, email:{email}, birthdate:{birthdate}, password:{password}, username:{username}")
+        
+        print("Confirm button clicked")
+        self.new_window()
+        
         sio.emit('credentials', data)
+
 
     def change_username (self):
         self.ui.username.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
@@ -191,10 +200,18 @@ class MainWindow(QMainWindow):
         self.globalchampionshippagewindow.show()
 
     def on_statistic_view (self):
-        self.statistic_window(self.homepage_window)
+        print("CurrentPage Statistic: ", str(currentpage))
+        if currentpage == 0:   
+            self.statistic_window(self.homepage_window)
+        elif currentpage == 1:
+            self.statistic_window(self.account_page_window)
 
     def on_account_view(self):
-        self.account_window(self.homepage_window)
+        print("CurrentPage Account: ", str(currentpage))
+        if currentpage == 0:   
+            self.account_window(self.homepage_window)
+        elif currentpage == 2:
+            self.account_window(self.statisticspage_window)
 
     def statistic_window (self, old_window):
         old_window.close()
@@ -215,9 +232,7 @@ class MainWindow(QMainWindow):
     
     def new_window1(self, old_window):
         old_window.close()
-        #self.new_window_instance = HomePage()
-        #global homepage_window
-        #homepage_window = self.new_window_instance
+
         self.homepage_window = HomePage() 
         self.homepage_window.show()
         self.homepage_window.user_field.setStyleSheet("color: white; font-size: 18px;")
@@ -232,7 +247,7 @@ class MainWindow(QMainWindow):
         #self.new_window_instance = SignIn()
         #global signup_window
         #self.signup_window = new_window_instance  
-        self.signup_window = SignIn()  
+        self.signup_window = SignUp()  
         self.signup_window.show()
 
     def on_signin_clicked(self, event):
@@ -273,14 +288,14 @@ class HomePage(QMainWindow):
         #self.board._game._myTurn = True
         self.board.updateBoard_fromOpponent(data)
 
-    def setup_ui(self):
+    '''def setup_ui(self):
         self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
         total_games=stats[0][1]
         total_wins=stats[0][2]
         elo=stats[0][4]
         level=stats[0][5]
-        self.ui.info_label.setText(f"Total Games: {total_games}\nTotal Wins: {total_wins}\nELO: {elo}\nLevel: {level}")
+        self.ui.info_label.setText(f"Total Games: {total_games}\nTotal Wins: {total_wins}\nELO: {elo}\nLevel: {level}")'''
 
     def statistics_page (self):
         #Retrieve data for the page
@@ -293,6 +308,8 @@ class HomePage(QMainWindow):
         self.ui = Ui_HomePage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
         self.user_field = self.ui.label_3
+        global currentpage
+        currentpage = 0
     
     def game_start(self):
         window.homepage_window.close()
@@ -390,6 +407,9 @@ class StatisticsPage(QMainWindow):
         self.globalchampionshippagewindow = None
         self.ui.local_championship_button.clicked.connect(self.localchampionshippage)
         self.ui.global_championship_button.clicked.connect(self.globalchampionshippage)
+        
+        self.ui.home_page_button.clicked.connect(self.home_page)
+        self.ui.account_button.clicked.connect(self.account_page)
 
     def setup_ui(self):
         self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
@@ -400,6 +420,9 @@ class StatisticsPage(QMainWindow):
         level=stats[0][5]
         self.ui.info_label.setText(f"Total Games: {total_games}\nTotal Wins: {total_wins}\nELO: {elo}\nLevel: {level}")
 
+        global currentpage
+        currentpage = 2
+
     def localchampionshippage(self):
         self.close()
         self.localchampionshippagewindow = LocalChampionshipPage()
@@ -408,10 +431,24 @@ class StatisticsPage(QMainWindow):
     def globalchampionshippage(self):
         sio.emit('GlobalChamp')
 
+    def home_page(self):
+        global currentpage
+        currentpage = 0
+        self.close()
+        window.homepage_window.show()
+
+    def account_page(self):
+        #self.close()
+        sio.emit('Account', username)
+        #window.statisticspage_window.close()
+
 class AccountPage(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
+
+        self.ui.pushButton_2.clicked.connect(self.home_page)
+        self.ui.pushButton_4.clicked.connect(self.statistics_page)
 
     def setup_ui(self):
         self.ui = Ui_AccountPage()  # Inizializza Ui_Form
@@ -422,6 +459,20 @@ class AccountPage(QMainWindow):
         elo = stats[0][4]
         self.ui.label_3.setText(f"{level}")
         self.ui.label_4.setText(f"{elo}")
+
+        global currentpage
+        currentpage = 1
+
+    def home_page(self):
+        global currentpage
+        currentpage = 0
+        self.close()
+        window.homepage_window.show()
+
+    def statistics_page(self):
+        #self.close()
+        sio.emit('Statistics', username)
+        #window.account_page_window.close()
 
 
 @sio.event
@@ -434,6 +485,7 @@ def statistic(data):
     if openStatisticPage == True:
         window.statistic_view.emit(window)
     openStatisticPage = True
+    
 
 @sio.event
 def account(data):
@@ -488,7 +540,7 @@ def confirmation_signup():
     print("Mail inviata")
 
     #signal emit
-    window.signup_confirmed.emit(window.signup_window)
+    #window.signup_confirmed.emit(window.signup_window)
 
     #global authenticated
     #authenticated = True
