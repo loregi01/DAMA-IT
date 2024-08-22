@@ -157,5 +157,36 @@ def sendGlobalChamp():
     result = cursor.fetchall()
     socketio.emit('globalchamp', result)
 
+@socketio.on('SearchFriend')
+def friend(username):
+    cursor.execute(f'SELECT * FROM user WHERE Username="{username}"')
+    result = cursor.fetchall()
+    if result:
+        socketio.emit('newFriend', result)
+    else:
+        socketio.emit('newFriend', "No user found")
+
+@socketio.on('AddFriend')
+def add_friend(data):
+    cursor.execute(f'SELECT UserID FROM user WHERE Username="{data[0]}"')
+    userid1 = cursor.fetchall()[0][0]
+    #socketio.emit('newFriendConfirmed', userid1)
+    cursor.execute(f'SELECT UserID FROM user WHERE Username="{data[1]}"')
+    userid2 = cursor.fetchall()[0][0]
+    cursor.execute(f'INSERT INTO umessage(Content, MDateTime, Sender) values("none", "00/00/0000 00:00:00", "{data[0]}")')
+    connection.commit()
+    cursor.execute(f'SELECT MessageID FROM umessage WHERE Sender="{data[0]}"')
+    messageid = cursor.fetchall()[0][0]
+    cursor.execute(f'INSERT INTO friend(User1, User2, Fmessage) values({int(userid1)}, {int(userid2)}, {int(messageid)})')
+    connection.commit()
+    socketio.emit('newFriendConfirmed', "Friend Added")
+
+@socketio.on('ShowFriends')
+def show_friend(data):
+    cursor.execute(f'SELECT u2.Username, u2.FirstName, u2.Surname FROM user AS u1, user AS u2, friend AS f WHERE u1.UserID = f.User1 AND u2.UserID = f.User2 AND u1.Username="{data}"')
+    friends_data = cursor.fetchall()
+    socketio.emit('FriendsData', friends_data)
+
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)

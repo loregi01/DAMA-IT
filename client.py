@@ -5,11 +5,12 @@ from views.statistics_page import Ui_Form as Ui_StatisticsPage
 from views.account_page import Ui_Form as Ui_AccountPage
 from views.local_championship import Ui_Form as Ui_LocalChampionshipPage
 from views.global_championship import Ui_Form as Ui_GlobalChampionshipPage
+from views.friends_page import Ui_MainWindow as Ui_FriendsPage
 from views.board import Board
 import views.sign_up_page
 import views.login_page
 from views.waiting import Ui_MainWindow as Ui_WaitingWindow
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
 from PySide6.QtCore import Signal, QSize, Qt, QRect, Signal
 from PySide6.QtGui import QPainter, QColor, QFont
 import sys
@@ -165,6 +166,8 @@ class MainWindow(QMainWindow):
     statistic_view = Signal(QMainWindow)
     account_view = Signal(QMainWindow)
     glob_champ_view = Signal(QMainWindow)
+    new_friend_data_view = Signal(list)
+    friends_data_view = Signal(list)
 
     def __init__(self):
         super().__init__()
@@ -190,6 +193,17 @@ class MainWindow(QMainWindow):
         self.statistic_view.connect(self.on_statistic_view)    
         self.account_view.connect(self.on_account_view)
         self.glob_champ_view.connect(self.on_glob_champ_view)
+        self.new_friend_data_view.connect(self.on_new_friend_data_view)
+        self.friends_data_view.connect(self.on_friends_data_view)
+
+    def on_new_friend_data_view(self, data):
+        print(data)
+        self.account_page_window.friend_window.show_new_friend(data)
+    
+    def on_friends_data_view(self, data):
+        print(data)
+        self.account_page_window.friend_window.show_friend(data)
+        
 
     def on_glob_champ_view(self):
         #self.statisticspage_window.close()
@@ -447,10 +461,14 @@ class AccountPage(QMainWindow):
         super().__init__()
         self.setup_ui()
 
+        self.friend_window = FriendsPage()
+
         self.ui.pushButton_2.clicked.connect(self.home_page)
         self.ui.pushButton_4.clicked.connect(self.statistics_page)
+        self.ui.label_6.mousePressEvent = self.on_friend_clicked
 
-    def setup_ui(self):
+    def setup_ui(self, friend=False):
+
         self.ui = Ui_AccountPage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
         self.ui.label.setText(f"{firstName}")
@@ -463,6 +481,10 @@ class AccountPage(QMainWindow):
         global currentpage
         currentpage = 1
 
+    def on_friend_clicked(self, event):
+        self.close()
+        self.friend_window.show()
+
     def home_page(self):
         global currentpage
         currentpage = 0
@@ -474,6 +496,135 @@ class AccountPage(QMainWindow):
         sio.emit('Statistics', username)
         #window.account_page_window.close()
 
+class RectWidget1(QWidget):
+    def __init__(self, name, surname, username):
+        super().__init__()
+
+        # Create layout
+        layout = QVBoxLayout()
+
+        # Create and style labels
+        username_label = QLabel(f"Username: {username}\nName: {name}\nSurname: {surname}")
+        username_label.setStyleSheet("color: black;")
+        layout.addWidget(username_label)
+
+        # Set widget style
+        self.setAutoFillBackground(True)
+        self.setStyleSheet("background-color: white; border-radius: 10px; border: 2px solid black;")
+
+        # Set layout to widget
+        self.setLayout(layout)
+
+        self.setFixedSize(400, 80)
+
+class FriendsPage(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.take_friend()
+
+        self.setup_ui()
+
+        self.ui.homepage.clicked.connect(self.home_page)
+        self.ui.account.clicked.connect(self.account_page)
+        self.ui.statistics.clicked.connect(self.statistics_page)
+        self.ui.search.clicked.connect(self.search_friend)
+
+    def setup_ui(self):
+        self.ui = Ui_FriendsPage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+
+        global currentpage
+        currentpage = 2
+
+    def show_new_friend(self, data):
+        container = QWidget()
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.Alignment.AlignTop)
+        layout.setSpacing(10)
+
+        # Itera su ciascun valore nei dati ricevuti
+        for value in data:
+            # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
+            h_layout = QHBoxLayout()
+
+            # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
+            rect_widget = RectWidget1(value[1], value[2], value[5])
+
+            # Crea il pulsante associato al valore corrente
+            button = QPushButton("Azione per " + value[1])  # Usa value[1] per il testo del pulsante, ad esempio
+
+            # Connetti il pulsante a un metodo che esegue un'azione
+            button.clicked.connect(lambda checked, v=value[5]: self.on_friend_button_clicked(v))
+
+            # Aggiungi RectWidget1 e il pulsante al layout orizzontale
+            h_layout.addWidget(rect_widget)
+            h_layout.addWidget(button)
+
+            # Aggiungi il layout orizzontale al layout principale
+            layout.addLayout(h_layout)
+
+        container.setLayout(layout)
+        self.ui.scrollArea.setWidget(container)
+        self.ui.scrollArea.setWidgetResizable(True)
+
+    def on_friend_button_clicked(self, value_friend):
+        print(f"Pulsante cliccato per l'amico: {value_friend}")  # Esegui un'azione specifica con i dati dell'amico
+        sio.emit('AddFriend', [username, value_friend])
+
+    def take_friend(self):
+        sio.emit('ShowFriends', username)
+
+    def show_friend(self, data):
+        container = QWidget()
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.Alignment.AlignTop)
+        layout.setSpacing(0)
+        # Aggiungi i rettangoli al layout
+        for value in data:
+            rect_widget = RectWidget1(value[0], value[1], value[2])
+            layout.addWidget(rect_widget)
+
+        container.setLayout(layout)
+        self.ui.scrollArea_2.setWidget(container)
+        self.ui.scrollArea_2.setWidgetResizable(True)
+
+    def search_friend(self):
+        new_friend = self.ui.lineEdit.text()
+
+        if new_friend == "":
+            self.ui.lineEdit.setStyleSheet("QLineEdit { border: 2px solid red; }")
+        else:
+            sio.emit('SearchFriend', new_friend)
+
+    def home_page(self):
+        global currentpage
+        currentpage = 0
+        self.close()
+        window.homepage_window.show()
+
+    def account_page(self):
+        sio.emit('Account', username)
+    
+    def statistics_page(self):
+        sio.emit('Statistics', username)
+
+@sio.event
+def FriendsData(data):
+    print("FRIENDS: ")
+    print(data)
+    window.friends_data_view.emit(data)
+
+@sio.event
+def newFriendConfirmed(data):
+    print(data)
+    #window.friends_data_view.emit(username)
+
+@sio.event
+def newFriend(data):
+    print("New Friend: ", data)
+    #window.on_new_friend_data_view(data)
+    window.new_friend_data_view.emit(data)
 
 @sio.event
 def statistic(data):
