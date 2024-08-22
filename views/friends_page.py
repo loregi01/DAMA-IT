@@ -21,7 +21,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(u"label_2")
         self.label_2.setGeometry(QRect(0, 0, 900, 600))
         self.label_2.setMouseTracking(True)
-        self.label_2.setPixmap(QPixmap(u":/newPrefix/graphics/background1.png"))
+        self.label_2.setPixmap(QPixmap(u"views/graphics/background1.png"))
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(360, 30, 161, 51))
@@ -57,20 +57,20 @@ class Ui_MainWindow(object):
         self.homepage.setObjectName(u"homepage")
         self.homepage.setGeometry(QRect(0, 500, 301, 101))
         self.homepage.setStyleSheet(u"color: rgb(255, 255, 255);\n"
-"background-image: url(:/newPrefix/graphics/background1.png);\n"
+"background-image: url(views/graphics/background1.png);\n"
 "font: 15pt \"Times New Roman\";")
         self.account = QPushButton(self.centralwidget)
         self.account.setObjectName(u"account")
         self.account.setGeometry(QRect(300, 500, 301, 101))
         self.account.setStyleSheet(u"font: 15pt \"Times New Roman\";\n"
 "color: rgb(255, 255, 255);\n"
-"background-image: url(:/newPrefix/graphics/background1.png);")
+"background-image: url(views/graphics/background1.png);")
         self.statistics = QPushButton(self.centralwidget)
         self.statistics.setObjectName(u"statistics")
         self.statistics.setGeometry(QRect(600, 500, 301, 101))
         self.statistics.setStyleSheet(u"font: 15pt \"Times New Roman\";\n"
 "color: rgb(255, 255, 255);\n"
-"background-image: url(:/newPrefix/graphics/background1.png);")
+"background-image: url(views/graphics/background1.png);")
         self.scrollArea_2 = QScrollArea(self.centralwidget)
         self.scrollArea_2.setObjectName(u"scrollArea_2")
         self.scrollArea_2.setGeometry(QRect(190, 320, 491, 171))
