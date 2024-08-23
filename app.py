@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_socketio import SocketIO, join_room, leave_room
+from flask_socketio import SocketIO, join_room, leave_room, emit
 from flask import request
 import pika
 import os
@@ -17,6 +17,11 @@ room_id = []
 connection = mysql.connector.connect(user=os.getenv("MYSQL_USERNAME"), password=os.getenv("MYSQL_PASSWORD"), host='mysql', port="3306", database=os.getenv("MYSQL_DB"))
 print("DB connected")
 cursor = connection.cursor()
+
+credentials = pika.PlainCredentials(os.getenv("RABBITMQ_USERNAME"), os.getenv("RABBITMQ_PASSWORD"))
+connection_rabbit = pika.BlockingConnection(pika.ConnectionParameters(host="rabbitmq", credentials=credentials))
+channel = connection_rabbit.channel()
+channel.queue_declare(queue='chat')
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -189,6 +194,38 @@ def show_friend(data):
     friends_data = cursor.fetchall()
     socketio.emit('FriendsData', friends_data)
 
+@socketio.on('join')
+def on_join(data):
+    username = data['username']
+    room = data['room']
+    join_room(room)
+    #socketio.emit('rabbitmq_test', f'{username} has entered the room {room}.')
+    emit('message', {'message': f'{username} has entered the room.'}, room=room)
+
+@socketio.on('leave')
+def on_leave(data):
+    username = data['username']
+    room = data['room']
+    leave_room(room)
+    emit('message', {'message': f'{username} has left the room.'}, room=room)
+
+@socketio.on('send_message')
+def handle_send_message(data):
+    room = data['room']
+    message = data['message']
+    
+    if message:
+        # Pubblica il messaggio su RabbitMQ
+        channel.basic_publish(exchange='', routing_key='chat', body=message)
+        emit('message', {'message': message}, room=room)
+
+def rabbitmq_callback(ch, method, properties, body):
+    # Invia il messaggio ricevuto a tutti i client connessi alla stanza
+    message = body.decode()
+    socketio.emit('message', {'message': message}, broadcast=True)
+    # Consuma i messaggi dalla coda RabbitMQ
+
+channel.basic_consume(queue='chat', on_message_callback=rabbitmq_callback, auto_ack=True)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)

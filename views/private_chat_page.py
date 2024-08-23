@@ -71,6 +71,7 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
         self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 489, 319))
+        '''
         self.horizontalLayoutWidget = QWidget(self.scrollAreaWidgetContents_2)
         self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
         self.horizontalLayoutWidget.setGeometry(QRect(0, 0, 251, 321))
@@ -82,7 +83,7 @@ class Ui_MainWindow(object):
         self.horizontalLayoutWidget_2.setGeometry(QRect(250, 0, 241, 321))
         self.horizontalLayout_2 = QHBoxLayout(self.horizontalLayoutWidget_2)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)'''
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
         MainWindow.setCentralWidget(self.centralwidget)
 

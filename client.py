@@ -7,11 +7,12 @@ from views.local_championship import Ui_Form as Ui_LocalChampionshipPage
 from views.global_championship import Ui_Form as Ui_GlobalChampionshipPage
 from views.friends_page import Ui_MainWindow as Ui_FriendsPage
 from views.chat_page import Ui_MainWindow as Ui_ChatPage
+from views.private_chat_page import Ui_MainWindow as Ui_PrivateChatPage
 from views.board import Board
 import views.sign_up_page
 import views.login_page
 from views.waiting import Ui_MainWindow as Ui_WaitingWindow
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QScrollArea
 from PySide6.QtCore import Signal, QSize, Qt, QRect, Signal
 from PySide6.QtGui import QPainter, QColor, QFont
 import sys
@@ -617,6 +618,78 @@ class FriendsPage(QMainWindow):
     def statistics_page(self):
         sio.emit('Statistics', username)
 
+class PrivateChatPage(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.user_chat = ""
+        self.setup_ui()
+
+        self.room = None
+
+        sio.on('message', self.receive_message)
+
+        self.ui.homepage.clicked.connect(self.home_page)
+        self.ui.account.clicked.connect(self.account_page)
+        self.ui.statistics.clicked.connect(self.statistics_page)
+        self.ui.search.clicked.connect(self.on_send_button)
+
+    def setup_ui(self):
+        self.ui = Ui_PrivateChatPage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+
+        container = QWidget()
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.Alignment.AlignTop)
+        layout.setSpacing(0)
+
+        # Aggiungi i rettangoli al layout
+        rect_widget = RectWidget1("Messaggio","Messaggio","Sto cazzo")
+        layout.addWidget(rect_widget)
+
+        container.setLayout(layout)
+        self.ui.scrollArea_2.setWidget(container)
+        self.ui.scrollArea_2.setWidgetResizable(True)
+
+        
+        #global currentpage
+        #currentpage = 2
+
+    def home_page(self):
+        global currentpage
+        currentpage = 0
+        self.close()
+        window.homepage_window.show()
+
+    def account_page(self):
+        sio.emit('Account', username)
+    
+    def statistics_page(self):
+        sio.emit('Statistics', username)
+
+    def add_message(self):
+        message = self.input_field.text()
+        if message:
+            message_label = QLabel(f"Tu: {message}")
+            self.messages_layout.addWidget(message_label)
+            self.input_field.clear()
+
+            # Scorri automaticamente verso il basso
+            self.scroll_area.verticalScrollBar().setValue(self.scroll_area.verticalScrollBar().maximum())
+
+
+    def on_send_button(self):
+        message = self.ui.lineEdit.text()
+        if message:
+            sio.emit('send_message', {'room': self.room, 'message': message})
+            self.ui.lineEdit.clear()
+
+    def receive_message(self,data):
+        message = data['message']
+        #self.add_message_to_chat(message)
+
+        print(message)
+
 class ChatPage(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -624,6 +697,8 @@ class ChatPage(QMainWindow):
         self.take_friend()
 
         self.setup_ui()
+
+        self.private_chat_page = PrivateChatPage()
 
         self.ui.homepage.clicked.connect(self.home_page)
         self.ui.account.clicked.connect(self.account_page)
@@ -669,7 +744,17 @@ class ChatPage(QMainWindow):
         self.ui.scrollArea.setWidgetResizable(True)
 
     def on_chat_button_clicked(self, value_friend):
-        print(value_friend)
+        self.close()
+        room_id = None
+        if username < value_friend:
+            room_id = username+value_friend
+        else:
+            room_id = value_friend+username
+        self.private_chat_page.room = room_id
+        self.private_chat_page.user_chat = value_friend
+        #self.private_chat_page.ui.label.setText(f"Chat With")
+        self.private_chat_page.show()
+        sio.emit('join',{"username":username,"room":room_id})
 
     def take_friend(self):
         sio.emit('ShowFriends', username)
@@ -836,6 +921,11 @@ def globalchamp(data):
     globalChampList = sorted_data
     window.glob_champ_view.emit(window)
     #window.statisticspage_window.globalchampionshippagewindow.on_update_champ(sorted_data)
+
+@sio.event
+def rabbitmq_test(data):
+    print(data)
+
 
 
 
