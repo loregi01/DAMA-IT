@@ -6,6 +6,7 @@ from views.account_page import Ui_Form as Ui_AccountPage
 from views.local_championship import Ui_Form as Ui_LocalChampionshipPage
 from views.global_championship import Ui_Form as Ui_GlobalChampionshipPage
 from views.friends_page import Ui_MainWindow as Ui_FriendsPage
+from views.chat_page import Ui_MainWindow as Ui_ChatPage
 from views.board import Board
 import views.sign_up_page
 import views.login_page
@@ -203,6 +204,7 @@ class MainWindow(QMainWindow):
     def on_friends_data_view(self, data):
         print(data)
         self.account_page_window.friend_window.show_friend(data)
+        self.account_page_window.chat_window.show_new_friend(data)
         
 
     def on_glob_champ_view(self):
@@ -462,10 +464,12 @@ class AccountPage(QMainWindow):
         self.setup_ui()
 
         self.friend_window = FriendsPage()
+        self.chat_window = ChatPage()
 
         self.ui.pushButton_2.clicked.connect(self.home_page)
         self.ui.pushButton_4.clicked.connect(self.statistics_page)
         self.ui.label_6.mousePressEvent = self.on_friend_clicked
+        self.ui.label_5.mousePressEvent = self.on_chat_clicked
 
     def setup_ui(self, friend=False):
 
@@ -484,6 +488,10 @@ class AccountPage(QMainWindow):
     def on_friend_clicked(self, event):
         self.close()
         self.friend_window.show()
+
+    def on_chat_clicked (self, event):
+        self.close()
+        self.chat_window.show()
 
     def home_page(self):
         global currentpage
@@ -609,6 +617,83 @@ class FriendsPage(QMainWindow):
     def statistics_page(self):
         sio.emit('Statistics', username)
 
+class ChatPage(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.take_friend()
+
+        self.setup_ui()
+
+        self.ui.homepage.clicked.connect(self.home_page)
+        self.ui.account.clicked.connect(self.account_page)
+        self.ui.statistics.clicked.connect(self.statistics_page)
+        self.ui.search.clicked.connect(self.search_friend)
+
+    def setup_ui(self):
+        self.ui = Ui_ChatPage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+
+        global currentpage
+        currentpage = 2
+
+    def show_new_friend(self, data):
+        container = QWidget()
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.Alignment.AlignTop)
+        layout.setSpacing(10)
+
+        # Itera su ciascun valore nei dati ricevuti
+        for value in data:
+            # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
+            h_layout = QHBoxLayout()
+
+            # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
+            rect_widget = RectWidget1(value[0], value[1], value[2])
+
+            # Crea il pulsante associato al valore corrente
+            button = QPushButton("Chat")  # Usa value[1] per il testo del pulsante, ad esempio
+
+            # Connetti il pulsante a un metodo che esegue un'azione
+            button.clicked.connect(lambda checked, v=value[0]: self.on_chat_button_clicked(v))
+
+            # Aggiungi RectWidget1 e il pulsante al layout orizzontale
+            h_layout.addWidget(rect_widget)
+            h_layout.addWidget(button)
+
+            # Aggiungi il layout orizzontale al layout principale
+            layout.addLayout(h_layout)
+
+        container.setLayout(layout)
+        self.ui.scrollArea.setWidget(container)
+        self.ui.scrollArea.setWidgetResizable(True)
+
+    def on_chat_button_clicked(self, value_friend):
+        print(value_friend)
+
+    def take_friend(self):
+        sio.emit('ShowFriends', username)
+
+    def search_friend(self):
+        new_friend = self.ui.lineEdit.text()
+
+        if new_friend == "":
+            self.ui.lineEdit.setStyleSheet("QLineEdit { border: 2px solid red; }")
+        else:
+            sio.emit('SearchFriend', new_friend)
+
+    def home_page(self):
+        global currentpage
+        currentpage = 0
+        self.close()
+        window.homepage_window.show()
+
+    def account_page(self):
+        sio.emit('Account', username)
+    
+    def statistics_page(self):
+        sio.emit('Statistics', username)
+
 @sio.event
 def FriendsData(data):
     print("FRIENDS: ")
@@ -618,7 +703,7 @@ def FriendsData(data):
 @sio.event
 def newFriendConfirmed(data):
     print(data)
-    #window.friends_data_view.emit(username)
+    sio.emit('ShowFriends', username)
 
 @sio.event
 def newFriend(data):

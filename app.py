@@ -173,13 +173,15 @@ def add_friend(data):
     #socketio.emit('newFriendConfirmed', userid1)
     cursor.execute(f'SELECT UserID FROM user WHERE Username="{data[1]}"')
     userid2 = cursor.fetchall()[0][0]
-    cursor.execute(f'INSERT INTO umessage(Content, MDateTime, Sender) values("none", "00/00/0000 00:00:00", "{data[0]}")')
-    connection.commit()
-    cursor.execute(f'SELECT MessageID FROM umessage WHERE Sender="{data[0]}"')
-    messageid = cursor.fetchall()[0][0]
-    cursor.execute(f'INSERT INTO friend(User1, User2, Fmessage) values({int(userid1)}, {int(userid2)}, {int(messageid)})')
-    connection.commit()
-    socketio.emit('newFriendConfirmed', "Friend Added")
+    cursor.execute(f'SELECT * FROM friend WHERE User1={userid1} AND User2={userid2}')
+    if not cursor.fetchall():
+        cursor.execute(f'INSERT INTO umessage(Content, MDateTime, Sender) values("none", "00/00/0000 00:00:00", "{data[0]}")')
+        connection.commit()
+        cursor.execute(f'SELECT MessageID FROM umessage WHERE Sender="{data[0]}"')
+        messageid = cursor.fetchall()[0][0]
+        cursor.execute(f'INSERT INTO friend(User1, User2, Fmessage) values({int(userid1)}, {int(userid2)}, {int(messageid)})')
+        connection.commit()
+        socketio.emit('newFriendConfirmed', "Friend Added")
 
 @socketio.on('ShowFriends')
 def show_friend(data):
