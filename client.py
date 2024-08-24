@@ -526,6 +526,27 @@ class RectWidget1(QWidget):
 
         self.setFixedSize(400, 80)
 
+class RectWidget2(QWidget):
+    def __init__(self, message):
+        super().__init__()
+
+        # Create layout
+        layout = QVBoxLayout()
+
+        # Create and style labels
+        username_label = QLabel(f"Message: {message}\n")
+        username_label.setStyleSheet("color: black;")
+        layout.addWidget(username_label)
+
+        # Set widget style
+        self.setAutoFillBackground(True)
+        self.setStyleSheet("background-color: white; border-radius: 10px; border: 2px solid black;")
+
+        # Set layout to widget
+        self.setLayout(layout)
+
+        self.setFixedSize(400, 80)
+
 class FriendsPage(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -640,11 +661,11 @@ class PrivateChatPage(QMainWindow):
 
         container = QWidget()
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.Alignment.AlignTop)
+        layout.setAlignment(Qt.Alignment.AlignTop | Qt.Alignment.AlignRight)
         layout.setSpacing(0)
 
         # Aggiungi i rettangoli al layout
-        rect_widget = RectWidget1("Messaggio","Messaggio","Sto cazzo")
+        rect_widget = RectWidget2("Prova")
         layout.addWidget(rect_widget)
 
         container.setLayout(layout)
