@@ -8,6 +8,7 @@ from my_email import email_functions
 import mysql.connector
 from dotenv import load_dotenv
 import hashlib
+import time
 
 load_dotenv()
 connected_clients = {}
@@ -162,6 +163,14 @@ def sendGlobalChamp():
     result = cursor.fetchall()
     socketio.emit('globalchamp', result)
 
+@socketio.on('LocalChamp')
+def sendLocalChamp(username):
+    cursor.execute(f'SELECT UserID FROM user WHERE Username="{username}"')
+    id = cursor.fetchall()[0][0]
+    cursor.execute(f'SELECT Username,Elo FROM user JOIN statistic ON (Statistic=StatisticID) JOIN friend ON User2 = Username WHERE User1 = {id}')
+    result = cursor.fetchall()
+    socketio.emit('localchamp', result)
+
 @socketio.on('SearchFriend')
 def friend(username):
     cursor.execute(f'SELECT * FROM user WHERE Username="{username}"')
@@ -194,30 +203,59 @@ def show_friend(data):
     friends_data = cursor.fetchall()
     socketio.emit('FriendsData', friends_data)
 
+@socketio.on('retrieveMessages')
+def ret_messages(data):
+    user1 = data['user1']
+    user2 = data['user2']
+    cursor.execute(f'SELECT UserID FROM user WHERE Username="{user1}"')
+    userid1 = cursor.fetchall()[0][0]
+    cursor.execute(f'SELECT UserID FROM user WHERE Username="{user2}"')
+    userid2 = cursor.fetchall()[0][0]
+
+    cursor.execute(f'SELECT Sender, Content, MDateTime FROM friend JOIN umessage ON MessageID = Fmessage WHERE (User1 = {userid1} AND User2 = {userid2}) OR (User1 = {userid2} AND User2 = {userid1})')
+    messages = cursor.fetchall()
+
+    sorted_messages = sorted(messages, key=lambda x: x[2])
+    socketio.emit('MessagesData', sorted_messages)
+
+
 @socketio.on('join')
 def on_join(data):
     username = data['username']
     room = data['room']
     join_room(room)
     #socketio.emit('rabbitmq_test', f'{username} has entered the room {room}.')
-    emit('message', {'message': f'{username} has entered the room.'}, room=room)
+    #emit('message', {'message': f'{username} has entered the room.'}, room=room)
 
 @socketio.on('leave')
 def on_leave(data):
     username = data['username']
     room = data['room']
     leave_room(room)
-    emit('message', {'message': f'{username} has left the room.'}, room=room)
+    #emit('message', {'message': f'{username} has left the room.'}, room=room)
 
 @socketio.on('send_message')
 def handle_send_message(data):
     room = data['room']
     message = data['message']
+    sender = data['sender']
+    receiver = data['receiver']
     
+    cursor.execute(f'SELECT UserID FROM user WHERE Username="{sender}"')
+    userid1 = cursor.fetchall()[0][0]
+    cursor.execute(f'SELECT UserID FROM user WHERE Username="{receiver}"')
+    userid2 = cursor.fetchall()[0][0]
+    current_time = time.time()
+    cursor.execute(f'INSERT INTO umessage(Content, MDateTime, Sender) values("{message}", "{str(current_time)}", "{sender}")')
+    connection.commit()
+    cursor.execute(f'SELECT MessageID FROM umessage WHERE Sender="{sender}" AND MDateTime="{str(current_time)}"')
+    messageid = cursor.fetchall()[0][0]
+    cursor.execute(f'INSERT INTO friend(User1, User2, Fmessage) values({int(userid1)}, {int(userid2)}, {int(messageid)})')
+    connection.commit()
     if message:
         # Pubblica il messaggio su RabbitMQ
         channel.basic_publish(exchange='', routing_key='chat', body=message)
-        emit('message', {'message': message}, room=room)
+        emit('message', {'message': message, 'sender': sender}, room=room)
 
 def rabbitmq_callback(ch, method, properties, body):
     # Invia il messaggio ricevuto a tutti i client connessi alla stanza

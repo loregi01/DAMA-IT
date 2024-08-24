@@ -42,10 +42,6 @@ class Ui_Form(object):
         self.pushButton_3.setObjectName(u"pushButton_3")
         self.pushButton_3.setGeometry(QRect(600, 520, 301, 81))
         self.pushButton_3.setStyleSheet(u"color: rgb(255, 255, 255);")
-        self.label_2 = QLabel(Form)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setGeometry(QRect(10, 0, 31, 51))
-        self.label_2.setPixmap(QPixmap(u"views/graphics/arrow.png"))
 
         self.retranslateUi(Form)
 
@@ -58,6 +54,5 @@ class Ui_Form(object):
         self.pushButton.setText(QCoreApplication.translate("Form", u"ACCOUNT", None))
         self.pushButton_2.setText(QCoreApplication.translate("Form", u"HOME PAGE", None))
         self.pushButton_3.setText(QCoreApplication.translate("Form", u"STATISTICS", None))
-        self.label_2.setText("")
     # retranslateUi
 

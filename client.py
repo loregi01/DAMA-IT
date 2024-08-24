@@ -45,6 +45,7 @@ openStatisticPage = False
 authenticated = False
 Semail = None
 globalChampList = []
+localChampList = []
 
 currentpage = None
 
@@ -168,8 +169,10 @@ class MainWindow(QMainWindow):
     statistic_view = Signal(QMainWindow)
     account_view = Signal(QMainWindow)
     glob_champ_view = Signal(QMainWindow)
+    local_champ_view = Signal(QMainWindow)
     new_friend_data_view = Signal(list)
     friends_data_view = Signal(list)
+    messages_data_view = Signal(list)
 
     def __init__(self):
         super().__init__()
@@ -195,8 +198,13 @@ class MainWindow(QMainWindow):
         self.statistic_view.connect(self.on_statistic_view)    
         self.account_view.connect(self.on_account_view)
         self.glob_champ_view.connect(self.on_glob_champ_view)
+        self.local_champ_view.connect(self.on_local_champ_view)
         self.new_friend_data_view.connect(self.on_new_friend_data_view)
         self.friends_data_view.connect(self.on_friends_data_view)
+        self.messages_data_view.connect(self.on_messages_data_view)
+
+    def on_messages_data_view(self, data):
+        self.account_page_window.chat_window.private_chat_page.show_old_messages(data)
 
     def on_new_friend_data_view(self, data):
         print(data)
@@ -207,11 +215,12 @@ class MainWindow(QMainWindow):
         self.account_page_window.friend_window.show_friend(data)
         self.account_page_window.chat_window.show_new_friend(data)
         
+    def on_local_champ_view(self):
+        self.statisticspage_window.close()
+        self.localchampionshippagewindow = LocalChampionshipPage()
+        self.localchampionshippagewindow.show()
 
     def on_glob_champ_view(self):
-        #self.statisticspage_window.close()
-        print("CIAO")
-        #print(data)
         self.statisticspage_window.close()
         self.globalchampionshippagewindow = GlobalChampionshipPage()
         self.globalchampionshippagewindow.show()
@@ -357,10 +366,31 @@ class LocalChampionshipPage(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
+        self.container = QWidget()
+        self.layout = QVBoxLayout()
+        self.on_update_champ(localChampList)
+        #self.update_champ.connect(self.on_update_champ)
 
     def setup_ui(self):
         self.ui = Ui_LocalChampionshipPage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+    
+    def on_update_champ(self, data):
+        print(data)
+        container = QWidget()
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.Alignment.AlignTop)
+        layout.setSpacing(0)
+
+        #print(data[0])
+        # Aggiungi i rettangoli al layout
+        for value in data:
+            rect_widget = RectWidget(value[0], value[1])
+            layout.addWidget(rect_widget)
+
+        container.setLayout(layout)
+        self.ui.scrollArea.setWidget(container)
+        self.ui.scrollArea.setWidgetResizable(True)
 
 class RectWidget(QWidget):
     def __init__(self, username, elo):
@@ -441,9 +471,7 @@ class StatisticsPage(QMainWindow):
         currentpage = 2
 
     def localchampionshippage(self):
-        self.close()
-        self.localchampionshippagewindow = LocalChampionshipPage()
-        self.localchampionshippagewindow.show()
+        sio.emit('LocalChamp', username)
 
     def globalchampionshippage(self):
         sio.emit('GlobalChamp')
@@ -534,10 +562,11 @@ class RectWidget2(QWidget):
         layout = QVBoxLayout()
 
         # Create and style labels
-        username_label = QLabel(f"Message: {message}\n")
+        username_label = QLabel(f"{message}\n")
         username_label.setStyleSheet("color: black;")
         layout.addWidget(username_label)
 
+        #layout.addLayout(layout)
         # Set widget style
         self.setAutoFillBackground(True)
         self.setStyleSheet("background-color: white; border-radius: 10px; border: 2px solid black;")
@@ -545,7 +574,7 @@ class RectWidget2(QWidget):
         # Set layout to widget
         self.setLayout(layout)
 
-        self.setFixedSize(400, 80)
+        self.setFixedSize(200, 50)
 
 class FriendsPage(QMainWindow):
     def __init__(self):
@@ -640,8 +669,13 @@ class FriendsPage(QMainWindow):
         sio.emit('Statistics', username)
 
 class PrivateChatPage(QMainWindow):
+    message_view = Signal(str, bool)
+       
     def __init__(self):
         super().__init__()
+
+        self.mainLayout = None
+        self.container = None
 
         self.user_chat = ""
         self.setup_ui()
@@ -654,27 +688,50 @@ class PrivateChatPage(QMainWindow):
         self.ui.account.clicked.connect(self.account_page)
         self.ui.statistics.clicked.connect(self.statistics_page)
         self.ui.search.clicked.connect(self.on_send_button)
+        
+        self.message_view.connect(self.add_message)
 
     def setup_ui(self):
         self.ui = Ui_PrivateChatPage()  # Inizializza Ui_Form
         self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
 
-        container = QWidget()
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.Alignment.AlignTop | Qt.Alignment.AlignRight)
-        layout.setSpacing(0)
+        self.container = QWidget()
 
-        # Aggiungi i rettangoli al layout
-        rect_widget = RectWidget2("Prova")
-        layout.addWidget(rect_widget)
+        # Layout principale verticale
+        self.mainLayout = QVBoxLayout()
+        self.mainLayout.setSpacing(0)  # Imposta lo spazio tra i messaggi
 
-        container.setLayout(layout)
-        self.ui.scrollArea_2.setWidget(container)
+
+        # Crea e aggiungi i widget alternati
+        '''rect_widget1 = RectWidget2("ProvaLeft")
+        rect_widget2 = RectWidget2("ProvaRight")
+        rect_widget3 = RectWidget2("ProvaLeft")
+        rect_widget4 = RectWidget2("ProvaRight")
+
+        # Imposta l'allineamento di ogni widget, simulando una chat alternata
+        mainLayout.addWidget(rect_widget1, alignment=Qt.Alignment.AlignLeft)
+        mainLayout.addWidget(rect_widget2, alignment=Qt.Alignment.AlignRight)
+        mainLayout.addWidget(rect_widget3, alignment=Qt.Alignment.AlignLeft)
+        mainLayout.addWidget(rect_widget4, alignment=Qt.Alignment.AlignRight)'''
+
+        # Imposta il layout principale al container
+        self.container.setLayout(self.mainLayout)
+
+        # Imposta il widget container nello ScrollArea
+        self.ui.scrollArea_2.setWidget(self.container)
         self.ui.scrollArea_2.setWidgetResizable(True)
-
-        
         #global currentpage
         #currentpage = 2
+
+    def show_old_messages(self, messages):
+        for m in messages:
+            if m[1] != "none":
+                if m[0] == username:
+                    rect_widget = RectWidget2(m[1])
+                    self.mainLayout.addWidget(rect_widget, alignment=Qt.Alignment.AlignRight)
+                else:
+                    rect_widget = RectWidget2(m[1])
+                    self.mainLayout.addWidget(rect_widget, alignment=Qt.Alignment.AlignLeft)
 
     def home_page(self):
         global currentpage
@@ -688,26 +745,34 @@ class PrivateChatPage(QMainWindow):
     def statistics_page(self):
         sio.emit('Statistics', username)
 
-    def add_message(self):
-        message = self.input_field.text()
+    def add_message(self, message, mymessage):
+        #message = self.input_field.text()
+        self.mainLayout.setSpacing(0)
         if message:
-            message_label = QLabel(f"Tu: {message}")
-            self.messages_layout.addWidget(message_label)
-            self.input_field.clear()
+            if mymessage:
+                rect_widget = RectWidget2(message)
+                self.mainLayout.addWidget(rect_widget, alignment=Qt.Alignment.AlignRight)
+            else:
+                rect_widget = RectWidget2(message)
+                self.mainLayout.addWidget(rect_widget, alignment=Qt.Alignment.AlignLeft)
+            #self.input_field.clear()
 
             # Scorri automaticamente verso il basso
-            self.scroll_area.verticalScrollBar().setValue(self.scroll_area.verticalScrollBar().maximum())
+            self.ui.scrollArea_2.verticalScrollBar().setValue(self.ui.scrollArea_2.verticalScrollBar().maximum())
 
 
     def on_send_button(self):
         message = self.ui.lineEdit.text()
         if message:
-            sio.emit('send_message', {'room': self.room, 'message': message})
+            sio.emit('send_message', {'room': self.room, 'message': message, 'sender': username, 'receiver': self.user_chat})
             self.ui.lineEdit.clear()
+            self.add_message(message, True)
 
     def receive_message(self,data):
         message = data['message']
-        #self.add_message_to_chat(message)
+        sender = data['sender']
+        if sender != username:
+            self.message_view.emit(message, False)
 
         print(message)
 
@@ -766,6 +831,9 @@ class ChatPage(QMainWindow):
 
     def on_chat_button_clicked(self, value_friend):
         self.close()
+
+        sio.emit('retrieveMessages', {"user1": username, "user2": value_friend})
+
         room_id = None
         if username < value_friend:
             room_id = username+value_friend
@@ -773,7 +841,8 @@ class ChatPage(QMainWindow):
             room_id = value_friend+username
         self.private_chat_page.room = room_id
         self.private_chat_page.user_chat = value_friend
-        #self.private_chat_page.ui.label.setText(f"Chat With")
+        self.private_chat_page.ui.label.setText(f"Chat With {value_friend}")
+        self.private_chat_page.user_chat = value_friend
         self.private_chat_page.show()
         sio.emit('join',{"username":username,"room":room_id})
 
@@ -799,6 +868,10 @@ class ChatPage(QMainWindow):
     
     def statistics_page(self):
         sio.emit('Statistics', username)
+
+@sio.event
+def MessagesData(data):
+    window.messages_data_view.emit(data)
 
 @sio.event
 def FriendsData(data):
@@ -941,6 +1014,15 @@ def globalchamp(data):
     global globalChampList
     globalChampList = sorted_data
     window.glob_champ_view.emit(window)
+    #window.statisticspage_window.globalchampionshippagewindow.on_update_champ(sorted_data)
+
+@sio.event
+def localchamp(data):
+    sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
+    print("LOCAL CHAMP: ", sorted_data)
+    global localChampList
+    localChampList = sorted_data
+    window.local_champ_view.emit(window)
     #window.statisticspage_window.globalchampionshippagewindow.on_update_champ(sorted_data)
 
 @sio.event
