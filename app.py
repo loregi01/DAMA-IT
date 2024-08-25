@@ -167,18 +167,24 @@ def sendGlobalChamp():
 def sendLocalChamp(username):
     cursor.execute(f'SELECT UserID FROM user WHERE Username="{username}"')
     id = cursor.fetchall()[0][0]
-    cursor.execute(f'SELECT Username,Elo FROM user JOIN statistic ON (Statistic=StatisticID) JOIN friend ON User2 = Username WHERE User1 = {id}')
-    result = cursor.fetchall()
-    socketio.emit('localchamp', result)
+    cursor.execute(f'SELECT UserID,Username,Statistic FROM user JOIN friend on (User2=UserID) WHERE User1={id}')
+    result_temp = cursor.fetchall()
+    list = []
+    for temp in result_temp:
+        stat_id = temp[2]
+        cursor.execute(f'SELECT Elo FROM statistic WHERE StatisticID={stat_id}')
+        elo = cursor.fetchall()[0][0]
+        list.append((temp[1],elo))
+    socketio.emit('localchamp', list)
 
 @socketio.on('SearchFriend')
-def friend(username):
-    cursor.execute(f'SELECT * FROM user WHERE Username="{username}"')
+def friend(data):
+    cursor.execute(f'SELECT * FROM user WHERE Username="{data["friend"]}"')
     result = cursor.fetchall()
     if result:
-        socketio.emit('newFriend', result)
+        socketio.emit('newFriend', {"user":data["user"], "result":result})
     else:
-        socketio.emit('newFriend', "No user found")
+        socketio.emit('newFriend', {"user":data["user"], "result":"No user found"})
 
 @socketio.on('AddFriend')
 def add_friend(data):
@@ -201,7 +207,7 @@ def add_friend(data):
 def show_friend(data):
     cursor.execute(f'SELECT u2.Username, u2.FirstName, u2.Surname FROM user AS u1, user AS u2, friend AS f WHERE u1.UserID = f.User1 AND u2.UserID = f.User2 AND u1.Username="{data}"')
     friends_data = cursor.fetchall()
-    socketio.emit('FriendsData', friends_data)
+    socketio.emit('FriendsData', {"user":data, "data":friends_data})
 
 @socketio.on('retrieveMessages')
 def ret_messages(data):

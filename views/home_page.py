@@ -13,6 +13,8 @@ class Ui_Form(object):
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(900, 600)
+        Form.setMinimumSize(QSize(900, 600))
+        Form.setMaximumSize(QSize(900, 600))
         Form.setStyleSheet(u"background-image: url(views/graphics/background1.png);")
         self.label = QLabel(Form)
         self.label.setObjectName(u"label")

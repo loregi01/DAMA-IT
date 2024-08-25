@@ -13,12 +13,13 @@ class Ui_Form(object):
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(900, 600)
+        Form.setMinimumSize(QSize(900, 600))
+        Form.setMaximumSize(QSize(900, 600))
         Form.setStyleSheet(u"background-image: url(views/graphics/background1.png);")
         self.scrollArea = QScrollArea(Form)
         self.scrollArea.setObjectName(u"scrollArea")
         self.scrollArea.setGeometry(QRect(170, 60, 561, 451))
-        self.scrollArea.setStyleSheet(u"border: 1px solid white;\n"
-"border-radius: 10px;")
+        self.scrollArea.setStyleSheet(u"border: 1px solid white;\n")
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")

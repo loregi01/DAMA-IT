@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
         self.label_2.setPixmap(QPixmap(u"views/graphics/background1.png"))
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
-        self.label.setGeometry(QRect(360, 30, 161, 51))
+        self.label.setGeometry(QRect(0, 30, 900, 51))
         self.label.setStyleSheet(u"color: rgb(255, 255, 255);\n"
 "font: 20pt \"Times New Roman\";")
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.label_2.setText("")
-        self.label.setText(QCoreApplication.translate("MainWindow", u"FRIENDS", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"CHAT WITH FRIENDS", None))
         self.search.setText(QCoreApplication.translate("MainWindow", u"Search", None))
         self.lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search to chat with someone...", None))
         self.homepage.setText(QCoreApplication.translate("MainWindow", u"HOMEPAGE", None))

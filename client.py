@@ -401,17 +401,17 @@ class RectWidget(QWidget):
 
         # Create and style labels
         username_label = QLabel(f"Username: {username}\nELO: {elo}")
-        username_label.setStyleSheet("color: white;")
+        username_label.setStyleSheet("color: white; font-size:15px;padding-left:10px")
         layout.addWidget(username_label)
 
         # Set widget style
         self.setAutoFillBackground(True)
-        self.setStyleSheet("background-color: black; border-radius: 10px; border: 2px solid white;")
+        self.setStyleSheet("background-color: black; border: 2px solid white;")
 
         # Set layout to widget
         self.setLayout(layout)
 
-        self.setFixedSize(530, 100)
+        self.setFixedSize(500, 100)
 
 class GlobalChampionshipPage(QMainWindow):
     #update_champ = Signal(QMainWindow)
@@ -552,7 +552,7 @@ class RectWidget1(QWidget):
         # Set layout to widget
         self.setLayout(layout)
 
-        self.setFixedSize(400, 80)
+        self.setFixedSize(375, 80)
 
 class RectWidget2(QWidget):
     def __init__(self, message):
@@ -595,33 +595,62 @@ class FriendsPage(QMainWindow):
 
         global currentpage
         currentpage = 2
+        self.ui.search.setStyleSheet("""QPushButton {
+                                            border: 2px solid black;       
+                                            background-color: white;     
+                                            color: black;                
+                                            padding: 10px;               
+                                            border-radius: 15px;        
+                                        }
+                                        QPushButton:hover {
+                                            background-color: lightgray; 
+                                        }
+                                    """)
 
     def show_new_friend(self, data):
         container = QWidget()
         layout = QVBoxLayout()
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(10)
-
-        # Itera su ciascun valore nei dati ricevuti
-        for value in data:
-            # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
+        print(len(data))
+        if len(data) > 1:
             h_layout = QHBoxLayout()
-
-            # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
-            rect_widget = RectWidget1(value[1], value[2], value[5])
-
-            # Crea il pulsante associato al valore corrente
-            button = QPushButton("Azione per " + value[1])  # Usa value[1] per il testo del pulsante, ad esempio
-
-            # Connetti il pulsante a un metodo che esegue un'azione
-            button.clicked.connect(lambda checked, v=value[5]: self.on_friend_button_clicked(v))
-
-            # Aggiungi RectWidget1 e il pulsante al layout orizzontale
-            h_layout.addWidget(rect_widget)
-            h_layout.addWidget(button)
-
-            # Aggiungi il layout orizzontale al layout principale
+            label = QLabel("No user found")
+            label.setAlignment(Qt.AlignCenter)
+            h_layout.addWidget(label)
             layout.addLayout(h_layout)
+        else:
+            # Itera su ciascun valore nei dati ricevuti
+            for value in data:
+                # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
+                h_layout = QHBoxLayout()
+
+                # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
+                rect_widget = RectWidget1(value[1], value[2], value[5])
+
+                # Crea il pulsante associato al valore corrente
+                button = QPushButton("Follow")  # Usa value[1] per il testo del pulsante, ad esempio
+                button.setStyleSheet("""QPushButton {
+                                            border: 2px solid black;       
+                                            background-color: white;     
+                                            color: black;                
+                                            padding: 10px;               
+                                            border-radius: 15px;        
+                                        }
+                                        QPushButton:hover {
+                                            background-color: lightgray; 
+                                        }
+                                    """)
+
+                # Connetti il pulsante a un metodo che esegue un'azione
+                button.clicked.connect(lambda checked, v=value[5]: self.on_friend_button_clicked(v))
+
+                # Aggiungi RectWidget1 e il pulsante al layout orizzontale
+                h_layout.addWidget(rect_widget)
+                h_layout.addWidget(button)
+
+                # Aggiungi il layout orizzontale al layout principale
+                layout.addLayout(h_layout)
 
         container.setLayout(layout)
         self.ui.scrollArea.setWidget(container)
@@ -654,7 +683,7 @@ class FriendsPage(QMainWindow):
         if new_friend == "":
             self.ui.lineEdit.setStyleSheet("QLineEdit { border: 2px solid red; }")
         else:
-            sio.emit('SearchFriend', new_friend)
+            sio.emit('SearchFriend', {"user":username, "friend":new_friend})
 
     def home_page(self):
         global currentpage
@@ -798,6 +827,18 @@ class ChatPage(QMainWindow):
         global currentpage
         currentpage = 2
 
+        self.ui.search.setStyleSheet("""QPushButton {
+                                            border: 2px solid black;       
+                                            background-color: white;     
+                                            color: black;                
+                                            padding: 10px;               
+                                            border-radius: 15px;        
+                                        }
+                                        QPushButton:hover {
+                                            background-color: lightgray; 
+                                        }
+                                    """)
+
     def show_new_friend(self, data):
         container = QWidget()
         layout = QVBoxLayout()
@@ -814,6 +855,17 @@ class ChatPage(QMainWindow):
 
             # Crea il pulsante associato al valore corrente
             button = QPushButton("Chat")  # Usa value[1] per il testo del pulsante, ad esempio
+            button.setStyleSheet("""QPushButton {
+                                            border: 2px solid black;       
+                                            background-color: white;     
+                                            color: black;                
+                                            padding: 10px;               
+                                            border-radius: 15px;        
+                                        }
+                                        QPushButton:hover {
+                                            background-color: lightgray; 
+                                        }
+                                    """)
 
             # Connetti il pulsante a un metodo che esegue un'azione
             button.clicked.connect(lambda checked, v=value[0]: self.on_chat_button_clicked(v))
@@ -875,9 +927,10 @@ def MessagesData(data):
 
 @sio.event
 def FriendsData(data):
-    print("FRIENDS: ")
-    print(data)
-    window.friends_data_view.emit(data)
+    if data["user"] == username:
+        print("FRIENDS: ")
+        print(data["data"])
+        window.friends_data_view.emit(data["data"])
 
 @sio.event
 def newFriendConfirmed(data):
@@ -886,9 +939,10 @@ def newFriendConfirmed(data):
 
 @sio.event
 def newFriend(data):
-    print("New Friend: ", data)
-    #window.on_new_friend_data_view(data)
-    window.new_friend_data_view.emit(data)
+    if data["user"] == username:
+        print("New Friend: ", data["result"])
+        #window.on_new_friend_data_view(data)
+        window.new_friend_data_view.emit(data["result"])
 
 @sio.event
 def statistic(data):
@@ -1018,12 +1072,13 @@ def globalchamp(data):
 
 @sio.event
 def localchamp(data):
+    print(data)
     sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
     print("LOCAL CHAMP: ", sorted_data)
     global localChampList
     localChampList = sorted_data
     window.local_champ_view.emit(window)
-    #window.statisticspage_window.globalchampionshippagewindow.on_update_champ(sorted_data)
+    #window.statisticspage_window.globalchampionshippagewindow.on_update_champ(sorted_data)'''
 
 @sio.event
 def rabbitmq_test(data):

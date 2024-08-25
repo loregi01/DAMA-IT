@@ -37,6 +37,8 @@ class Ui_Form(object):
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(900, 600)
+        Form.setMinimumSize(QSize(900, 600))
+        Form.setMaximumSize(QSize(900, 600))
         self.widget = QWidget(Form)
         self.widget.setObjectName(u"widget")
         self.widget.setGeometry(QRect(0, 0, 680, 600))

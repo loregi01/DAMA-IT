@@ -14,6 +14,8 @@ class Ui_Form(object):
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(900, 600)
+        Form.setMinimumSize(QSize(900, 600))
+        Form.setMaximumSize(QSize(900, 600))
         Form.setStyleSheet(u"background-image: url(views/graphics/background1.png);")
         self.statistics_label = QLabel(Form)
         self.statistics_label.setObjectName(u"statistics_label")
