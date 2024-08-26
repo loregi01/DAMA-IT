@@ -8,6 +8,7 @@ from views.global_championship import Ui_Form as Ui_GlobalChampionshipPage
 from views.friends_page import Ui_MainWindow as Ui_FriendsPage
 from views.chat_page import Ui_MainWindow as Ui_ChatPage
 from views.private_chat_page import Ui_MainWindow as Ui_PrivateChatPage
+from views.play_with_friends import Ui_MainWindow as Ui_PlayWithFriendsPage
 from views.board import Board
 import views.sign_up_page
 import views.login_page
@@ -37,6 +38,7 @@ email = ""
 username = ""
 birthdate = ""
 color = None
+friends = False
 
 #User stats
 stats = None
@@ -190,6 +192,8 @@ class MainWindow(QMainWindow):
 
         self.signup_window = None
         self.homepage_window = None
+        self.account_page_window = None
+        self.statisticspage_window = None
 
         #signal setup
         self.signup_confirmed.connect(self.on_confirm_clicked)
@@ -208,12 +212,16 @@ class MainWindow(QMainWindow):
 
     def on_new_friend_data_view(self, data):
         print(data)
-        self.account_page_window.friend_window.show_new_friend(data)
-    
+        if self.account_page_window is not None:
+            self.account_page_window.friend_window.show_new_friend(data)
+        self.homepage_window.playwithfriendspage.show_new_friend(data)
+
     def on_friends_data_view(self, data):
         print(data)
-        self.account_page_window.friend_window.show_friend(data)
-        self.account_page_window.chat_window.show_new_friend(data)
+        if self.account_page_window is not None:
+            self.account_page_window.friend_window.show_friend(data)
+            self.account_page_window.chat_window.show_new_friend(data)
+        self.homepage_window.playwithfriendspage.show_friend(data)
         
     def on_local_champ_view(self):
         self.statisticspage_window.close()
@@ -245,9 +253,10 @@ class MainWindow(QMainWindow):
         self.statisticspage_window.show()
 
     def account_window (self, old_window):
-        old_window.close()
-        self.account_page_window = AccountPage()
-        self.account_page_window.show()
+        if old_window is not None:
+            old_window.close()
+            self.account_page_window = AccountPage()
+            self.account_page_window.show()
 
     def on_login_unsuccess(self):
         email_field = views.login_page.email
@@ -301,8 +310,12 @@ class HomePage(QMainWindow):
         self.ui.pushButton.clicked.connect(self.game_start)
         self.ui.pushButton_6.clicked.connect(self.statistics_page)
         self.ui.pushButton_5.clicked.connect(self.account_page)
+        self.ui.pushButton_3.clicked.connect(self.play_with_friends)
         self.statisticspage_window = None
         self.accountpage_window = None
+        self.playwithfriendspage = None
+        self.waitingpage = None
+        #self.playwithfriendspage = PlayWithFriendsPage()
 
         self.update_board.connect(self.on_update_board)
         self.showBoard.connect(self.on_showBoard)
@@ -338,6 +351,9 @@ class HomePage(QMainWindow):
         currentpage = 0
     
     def game_start(self):
+        global friends
+        friends = False
+
         window.homepage_window.close()
 
         connect_with_opponent()
@@ -345,6 +361,11 @@ class HomePage(QMainWindow):
         self.close()
         self.waitingpage = WaitingPage()
         self.waitingpage.show()
+
+    def play_with_friends(self):
+        self.close()
+        self.playwithfriendspage = PlayWithFriendsPage()
+        self.playwithfriendspage.show()
 
     def on_showBoard(self):
         global color
@@ -672,6 +693,182 @@ class FriendsPage(QMainWindow):
         for value in data:
             rect_widget = RectWidget1(value[0], value[1], value[2])
             layout.addWidget(rect_widget)
+
+        container.setLayout(layout)
+        self.ui.scrollArea_2.setWidget(container)
+        self.ui.scrollArea_2.setWidgetResizable(True)
+
+    def search_friend(self):
+        new_friend = self.ui.lineEdit.text()
+
+        if new_friend == "":
+            self.ui.lineEdit.setStyleSheet("QLineEdit { border: 2px solid red; }")
+        else:
+            sio.emit('SearchFriend', {"user":username, "friend":new_friend})
+
+    def home_page(self):
+        global currentpage
+        currentpage = 0
+        self.close()
+        window.homepage_window.show()
+
+    def account_page(self):
+        sio.emit('Account', username)
+    
+    def statistics_page(self):
+        sio.emit('Statistics', username)
+
+
+class PlayWithFriendsPage(QMainWindow):
+    showBoard = Signal(QMainWindow)
+    update_board = Signal(QMainWindow)
+    def __init__(self):
+        super().__init__()
+
+        self.take_friend()
+
+        self.setup_ui()
+
+        self.ui.homepage.clicked.connect(self.home_page)
+        self.ui.account.clicked.connect(self.account_page)
+        self.ui.statistics.clicked.connect(self.statistics_page)
+        self.ui.search.clicked.connect(self.search_friend)
+
+        self.update_board.connect(self.on_update_board)
+        self.showBoard.connect(self.on_showBoard)
+
+        self.waiting_page = None
+
+    def setup_ui(self):
+        self.ui = Ui_PlayWithFriendsPage()  # Inizializza Ui_Form
+        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+
+        global currentpage
+        currentpage = 2
+        self.ui.search.setStyleSheet("""QPushButton {
+                                            border: 2px solid black;       
+                                            background-color: white;     
+                                            color: black;                
+                                            padding: 10px;               
+                                            border-radius: 15px;        
+                                        }
+                                        QPushButton:hover {
+                                            background-color: lightgray; 
+                                        }
+                                    """)
+
+    def show_new_friend(self, data):
+        container = QWidget()
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.Alignment.AlignTop)
+        layout.setSpacing(10)
+        print(len(data))
+        if len(data) > 1:
+            h_layout = QHBoxLayout()
+            label = QLabel("No user found")
+            label.setAlignment(Qt.AlignCenter)
+            h_layout.addWidget(label)
+            layout.addLayout(h_layout)
+        else:
+            # Itera su ciascun valore nei dati ricevuti
+            for value in data:
+                # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
+                h_layout = QHBoxLayout()
+
+                # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
+                rect_widget = RectWidget1(value[1], value[2], value[5])
+
+                # Crea il pulsante associato al valore corrente
+                button = QPushButton("Play")  # Usa value[1] per il testo del pulsante, ad esempio
+                button.setStyleSheet("""QPushButton {
+                                            border: 2px solid black;       
+                                            background-color: white;     
+                                            color: black;                
+                                            padding: 10px;               
+                                            border-radius: 15px;        
+                                        }
+                                        QPushButton:hover {
+                                            background-color: lightgray; 
+                                        }
+                                    """)
+
+                # Connetti il pulsante a un metodo che esegue un'azione
+                button.clicked.connect(lambda checked, v=value[5]: self.on_play_friend_button_clicked(v))
+
+                # Aggiungi RectWidget1 e il pulsante al layout orizzontale
+                h_layout.addWidget(rect_widget)
+                h_layout.addWidget(button)
+
+                # Aggiungi il layout orizzontale al layout principale
+                layout.addLayout(h_layout)
+
+        container.setLayout(layout)
+        self.ui.scrollArea.setWidget(container)
+        self.ui.scrollArea.setWidgetResizable(True)
+
+    def on_showBoard(self):
+        global color
+        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio)  # Create an instance of the Board class
+        self.board.setFixedSize(QSize(900, 600))
+        self.waiting_page.close()
+        self.board.show()
+
+    def on_update_board(self, data):
+        #self.board._game._pieceBoard = data
+        print("From on_update_board", data)
+        #self.board._game._isThinking = False
+        #self.board._game._myTurn = True
+        self.board.updateBoard_fromOpponent(data)
+
+    def on_play_friend_button_clicked(self, value_friend):
+        global friends
+        friends = True
+        print(f"Pulsante cliccato per l'amico: {value_friend}")  # Esegui un'azione specifica con i dati dell'amico
+        sio.emit('PlayFriend', [username, value_friend])
+        self.close()
+        self.waiting_page = WaitingPage()
+        self.waiting_page.show()
+
+    def take_friend(self):
+        sio.emit('ShowFriends', username)
+
+    def show_friend(self, data):
+        container = QWidget()
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.Alignment.AlignTop)
+        layout.setSpacing(10)
+
+        # Itera su ciascun valore nei dati ricevuti
+        for value in data:
+            # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
+            h_layout = QHBoxLayout()
+
+            # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
+            rect_widget = RectWidget1(value[0], value[1], value[2])
+
+            # Crea il pulsante associato al valore corrente
+            button = QPushButton("Play")  # Usa value[1] per il testo del pulsante, ad esempio
+            button.setStyleSheet("""QPushButton {
+                                            border: 2px solid black;       
+                                            background-color: white;     
+                                            color: black;                
+                                            padding: 10px;               
+                                            border-radius: 15px;        
+                                        }
+                                        QPushButton:hover {
+                                            background-color: lightgray; 
+                                        }
+                                    """)
+
+            # Connetti il pulsante a un metodo che esegue un'azione
+            button.clicked.connect(lambda checked, v=value[0]: self.on_play_friend_button_clicked(v))
+
+            # Aggiungi RectWidget1 e il pulsante al layout orizzontale
+            h_layout.addWidget(rect_widget)
+            h_layout.addWidget(button)
+
+            # Aggiungi il layout orizzontale al layout principale
+            layout.addLayout(h_layout)
 
         container.setLayout(layout)
         self.ui.scrollArea_2.setWidget(container)
@@ -1028,7 +1225,10 @@ def connect():
 def update(data):
     print("UPDATE")
     #window.homepage_window.update_board.emit(data)
-    window.homepage_window.on_update_board(data)
+    if not friends:
+        window.homepage_window.on_update_board(data)
+    else:
+        window.homepage_window.playwithfriendspage.on_update_board(data)
 
 def connect_with_opponent():
     name = username
@@ -1053,14 +1253,23 @@ def starting():
 @sio.event
 def matched(data):
     global color
-    if data == "white":
+    if data[0] == "white":
         color = True
     else:
         color = False
-    window.homepage_window.showBoard.emit(window)
+    if data[1] == "NoFriend":
+        window.homepage_window.showBoard.emit(window)
+    else:
+        window.homepage_window.playwithfriendspage.showBoard.emit(window)
+        print('debug')
     
     # Start the thread for sending messages ????
     #send_messages()
+
+@sio.event
+def debug(data):
+    print(data)
+
 @sio.event
 def globalchamp(data):
     sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))

@@ -14,6 +14,7 @@ load_dotenv()
 connected_clients = {}
 
 room_id = []
+waiting_queue = []
 
 connection = mysql.connector.connect(user=os.getenv("MYSQL_USERNAME"), password=os.getenv("MYSQL_PASSWORD"), host='mysql', port="3306", database=os.getenv("MYSQL_DB"))
 print("DB connected")
@@ -108,8 +109,8 @@ def try_match_clients(sender_id):
                 join_room(sender_id)
                 #join_room(client_id)
 
-                socketio.emit('matched', "white", room=sender_id)
-                socketio.emit('matched', "black", room=client_id)
+                socketio.emit('matched', ["white","NoFriend"], room=sender_id)
+                socketio.emit('matched', ["black","NoFriend"], room=client_id)
                             
 
                 #socketio.emit('matched', f"{sender_name} is matched with {client_data['name']} in room {sender_id}", room=sender_id)
@@ -132,7 +133,7 @@ def handle_message(data):
     #else:
     if receiver_id:
         if receiver_id != sender_id:
-            sender_name = connected_clients[sender_id]['name']
+            #sender_name = connected_clients[sender_id]['name']
             #receiver_name = connected_clients[receiver_id]['name']
         
             #socketio.emit('moves', f'{sender_name}: {data}', room=receiver_id)
@@ -176,6 +177,35 @@ def sendLocalChamp(username):
         elo = cursor.fetchall()[0][0]
         list.append((temp[1],elo))
     socketio.emit('localchamp', list)
+
+@socketio.on('PlayFriend')
+def play_friend(data):
+    client_id = request.sid
+    waiting_queue.append((client_id,data[0],data[1]))
+    found_ab = False
+    found_ba = False
+    sender_id = None
+
+    for t in waiting_queue:
+        if t[1] == data[0] and t[2] == data[1]:
+            found_ab = True
+        if t[1] == data[1] and t[2] == data[0]:
+            found_ba = True
+            sender_id = t[0]
+    
+    if found_ab and found_ba:
+        matched_clients[sender_id] = client_id
+        matched_clients[client_id] = sender_id
+                
+        join_room(client_id)
+
+        socketio.emit('matched', ["white","Friend"], room=sender_id)
+        socketio.emit('matched', ["black","Friend"], room=client_id)
+                                
+        room_id.append(client_id)
+
+    socketio.emit('debug',waiting_queue)
+
 
 @socketio.on('SearchFriend')
 def friend(data):
