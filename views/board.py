@@ -8,7 +8,7 @@ import time
 class Board(QGraphicsView):
     send_move = Signal(QGraphicsView)
 
-    def __init__(self, mode, difficulty, playerIsWhite, up, turn, s):
+    def __init__(self, mode, difficulty, playerIsWhite, up, turn, s, username):
         super().__init__()
         #self.send_move.connect(self.on_account_view)
         self.sio = s
@@ -21,6 +21,7 @@ class Board(QGraphicsView):
         self._game = None
         self._col = ""
         self._numberOfMoves = 0
+        self._username = username
 
         if self._gMode == "HUMAN_VS_HUMAN":
             if (turn and self._playerIsWhite) or (not turn and not self._playerIsWhite):
@@ -151,7 +152,7 @@ class Board(QGraphicsView):
                 return
 
             self.updateBoard()
-            #self.win_lose_mex()
+            self.win_lose_mex()
 
             if multiple_eat:
                 self._numberOfMoves = self._numberOfMoves + 1
@@ -195,6 +196,7 @@ class Board(QGraphicsView):
             boolMove, multiple_eat = self._game.move(move['x0'], move['y0'], move['x1'], move['y1'], multiple_eat)
         
         self.updateBoard()
+        self.win_lose_mex()
         self._game._myTurn = True
         self._game._isThinking = False
 
@@ -224,11 +226,11 @@ class Board(QGraphicsView):
                 else:
                     self._cells[i][j].setContent(Cell.EMPTY)
 
-    '''def win_lose_mex(self):
+    def win_lose_mex(self):
         if not self._game.ended():
             return
 
-        if self._gMode == "HUMAN_VS_HUMAN":
+        '''if self._gMode == "HUMAN_VS_HUMAN":
             if (self._playerIsWhite and self._game.wins() == 1) or (not self._playerIsWhite and self._game.wins() == 2):
                 choice = QMessageBox.information(self, "Match ended", "WHITE WIN!\nDo you want to start a new game? ", QMessageBox.Yes | QMessageBox.Close)
                 if choice == QMessageBox.Yes:
@@ -240,32 +242,20 @@ class Board(QGraphicsView):
                 if choice == QMessageBox.Yes:
                     MainWindow.instance().start()
                 else:
-                    MainWindow.instance().close()
+                    MainWindow.instance().close()'''
 
-        elif self._gMode == HUMAN_VS_AI:
+        if self._gMode == "HUMAN_VS_AI":
             if self._game.wins() == 1:
-                MainWindow.instance().save_class()
-                choice = QMessageBox.information(self, "Match ended", "YOU WIN\nDou you want to start a new game?", QMessageBox.Yes | QMessageBox.Close)
-                if choice == QMessageBox.Yes:
-                    MainWindow.instance().start()
-                else:
-                    MainWindow.instance().close()
+                choice = QMessageBox.information(self, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
+                if choice == QMessageBox.Ok:
+                    print("return to homepage, win")
+                    self.sio.emit('game_end', [self._username, 1])
             elif self._game.wins() == 2:
-                choice = QMessageBox.information(self, "Match ended", "AI WIN\nDou you want to start a new game?", QMessageBox.Yes | QMessageBox.Close)
-                if choice == QMessageBox.Yes:
-                    MainWindow.instance().start()
-                else:
-                    MainWindow.instance().close()
-'''
-    '''def hint(self):
-        if not self._game.isThinking():
-            moves = self._game.Hint()
-            for move in moves:
-                self._cells[move // self._n][move % self._n].setSuggested(True)
+                choice = QMessageBox.information(self, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
+                if choice == QMessageBox.Ok:
+                    print("return to homepage, lose")
+                    self.sio.emit('game_end', [self._username, 2])
 
-    def clear_selected(self):
-        self._cells[0][0].clear_selected_cells()
-'''
     def display_cells(self, xy_s, xy_n):
         if not self._game.isThinking():
             self._cells[xy_s // self._n][xy_s % self._n].setSuggested(True)

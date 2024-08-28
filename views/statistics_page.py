@@ -42,20 +42,20 @@ class Ui_Form(object):
 "font: 12pt \"Times New Roman\";")
         self.home_page_button = QPushButton(Form)
         self.home_page_button.setObjectName(u"home_page_button")
-        self.home_page_button.setGeometry(QRect(0, 500, 311, 101))
+        self.home_page_button.setGeometry(QRect(0, 500, 301, 101))
         self.home_page_button.setStyleSheet(u"color: rgb(255, 255, 255);\n"
-"font: 12pt \"Times New Roman\";")
+"font: 10pt \"Times New Roman\";")
         self.account_button = QPushButton(Form)
         self.account_button.setObjectName(u"account_button")
-        self.account_button.setGeometry(QRect(310, 500, 291, 101))
+        self.account_button.setGeometry(QRect(300, 500, 301, 101))
         self.account_button.setStyleSheet(u"color: rgb(255, 255, 255);\n"
-"font: 12pt \"Times New Roman\";")
+"font: 10pt \"Times New Roman\";")
         self.statistics_button = QPushButton(Form)
         self.statistics_button.setObjectName(u"statistics_button")
         self.statistics_button.setEnabled(False)
         self.statistics_button.setGeometry(QRect(600, 500, 301, 101))
         self.statistics_button.setStyleSheet(u"color: rgb(125, 125, 125);\n"
-"font: 12pt \"Times New Roman\";")
+"font: 10pt \"Times New Roman\";")
 
         self.retranslateUi(Form)
 
@@ -71,7 +71,7 @@ class Ui_Form(object):
 "Level:5", None))
         self.global_championship_button.setText(QCoreApplication.translate("Form", u"GLOBAL CHAMPIONSHIP", None))
         self.local_championship_button.setText(QCoreApplication.translate("Form", u"LOCAL CHAMPIONSHIP", None))
-        self.home_page_button.setText(QCoreApplication.translate("Form", u"HOME PAGE", None))
+        self.home_page_button.setText(QCoreApplication.translate("Form", u"HOMEPAGE", None))
         self.account_button.setText(QCoreApplication.translate("Form", u"ACCOUNT", None))
         self.statistics_button.setText(QCoreApplication.translate("Form", u"STATISTICS", None))
     # retranslateUi

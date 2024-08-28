@@ -122,6 +122,54 @@ def try_match_clients(sender_id):
                 #socketio.emit('starting', room=sender_id)
                 break
 
+@socketio.on('game_end')
+def gameEnd(data):
+    username = data[0]
+    game_result = data[1]
+
+    client_id = None
+    for key, value in connected_clients.items():
+        if value.get("name") == username:
+            client_id = key
+            break
+    if not client_id:
+        return
+    opponent_id = matched_clients[client_id] if client_id in matched_clients else None
+    if opponent_id == None:
+        return
+    opponent_user = connected_clients[opponent_id]['name']
+    if opponent_id in matched_clients:
+        del matched_clients[opponent_id]
+    if client_id in matched_clients:
+        del matched_clients[client_id]
+    if opponent_id in connected_clients:
+        del connected_clients[opponent_id]
+    if client_id in connected_clients:
+        del connected_clients[client_id]
+    
+    if game_result == 1:
+        cursor.execute(f'SELECT Statistic FROM user WHERE Username="{username}"')
+        stat_id = cursor.fetchall()[0][0]
+        cursor.execute(f'SELECT * FROM statistic WHERE StatisticID="{stat_id}"')
+        stat = cursor.fetchall()[0]
+        cursor.execute(f'UPDATE statistic SET Elo = "{str(int(stat[4]) + 5)}" WHERE StatisticID="{stat_id}"')
+        connection.commit()
+        cursor.execute(f'UPDATE statistic SET SLevel = "{str(int(stat[5]) + 1)}" WHERE StatisticID="{stat_id}"')
+        connection.commit()
+    else:
+        cursor.execute(f'SELECT Statistic FROM user WHERE Username="{opponent_user}"')
+        stat_id = cursor.fetchall()[0][0]
+        cursor.execute(f'SELECT * FROM statistic WHERE StatisticID="{stat_id}"')
+        stat = cursor.fetchall()[0]
+        cursor.execute(f'UPDATE statistic SET Elo = "{str(int(stat[4]) + 5)}" WHERE StatisticID="{stat_id}"')
+        connection.commit()
+        cursor.execute(f'UPDATE statistic SET SLevel = "{str(int(stat[5]) + 1)}" WHERE StatisticID="{stat_id}"')
+        connection.commit()
+    
+    socketio.emit('game_finish', [username, opponent_user])
+
+
+
 @socketio.on('moves')
 def handle_message(data):
     sender_id = request.sid

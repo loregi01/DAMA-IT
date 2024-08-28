@@ -57,19 +57,19 @@ class Ui_MainWindow(object):
         self.homepage.setObjectName(u"homepage")
         self.homepage.setGeometry(QRect(0, 500, 301, 101))
         self.homepage.setStyleSheet(u"color: rgb(255, 255, 255);\n"
-"background-image: url(views/graphics/background1.png);\n"
-"font: 15pt \"Times New Roman\";")
+"font: 10pt \"Times New Roman\";\n"
+"background-image: url(views/graphics/background1.png);")
         self.account = QPushButton(self.centralwidget)
         self.account.setObjectName(u"account")
         self.account.setGeometry(QRect(300, 500, 301, 101))
-        self.account.setStyleSheet(u"font: 15pt \"Times New Roman\";\n"
-"color: rgb(255, 255, 255);\n"
+        self.account.setStyleSheet(u"color: rgb(255, 255, 255);\n"
+"font: 10pt \"Times New Roman\";\n"
 "background-image: url(views/graphics/background1.png);")
         self.statistics = QPushButton(self.centralwidget)
         self.statistics.setObjectName(u"statistics")
         self.statistics.setGeometry(QRect(600, 500, 301, 101))
-        self.statistics.setStyleSheet(u"font: 15pt \"Times New Roman\";\n"
-"color: rgb(255, 255, 255);\n"
+        self.statistics.setStyleSheet(u"color: rgb(255, 255, 255);\n"
+"font: 10pt \"Times New Roman\";\n"
 "background-image: url(views/graphics/background1.png);")
         self.scrollArea_2 = QScrollArea(self.centralwidget)
         self.scrollArea_2.setObjectName(u"scrollArea_2")

@@ -1,6 +1,6 @@
 use db;
 
-DROP TABLE IF EXISTS statistic, user, guest, umessage, play, friend;
+DROP TABLE IF EXISTS statistic, user, umessage, play, friend;
 
 CREATE TABLE statistic (
     StatisticID int not null AUTO_INCREMENT,
@@ -23,12 +23,6 @@ CREATE TABLE user (
     Statistic int NOT NULL,
     PRIMARY KEY (UserID),
     FOREIGN KEY (Statistic) REFERENCES statistic (StatisticID)
-);
-
-CREATE TABLE guest (
-    GuestID int not null AUTO_INCREMENT,
-    RandomUsername varchar(100) NOT NULL,
-    PRIMARY KEY (GuestID)
 );
 
 CREATE TABLE umessage (

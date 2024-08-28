@@ -44,15 +44,18 @@ class Ui_Form(object):
         self.pushButton_4.setObjectName(u"pushButton_4")
         self.pushButton_4.setEnabled(False)
         self.pushButton_4.setGeometry(QRect(0, 500, 301, 101))
-        self.pushButton_4.setStyleSheet(u"color: rgb(136, 136, 136);")
+        self.pushButton_4.setStyleSheet(u"color: rgb(125, 125, 125);\n"
+"font: 10pt \"Times New Roman\";")
         self.pushButton_5 = QPushButton(Form)
         self.pushButton_5.setObjectName(u"pushButton_5")
         self.pushButton_5.setGeometry(QRect(300, 500, 301, 101))
-        self.pushButton_5.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton_5.setStyleSheet(u"color: rgb(255, 255, 255);\n"
+"font: 10pt \"Times New Roman\";")
         self.pushButton_6 = QPushButton(Form)
         self.pushButton_6.setObjectName(u"pushButton_6")
         self.pushButton_6.setGeometry(QRect(600, 500, 301, 101))
-        self.pushButton_6.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton_6.setStyleSheet(u"color: rgb(255, 255, 255);\n"
+"font: 10pt \"Times New Roman\";")
 
         self.retranslateUi(Form)
 
@@ -66,7 +69,7 @@ class Ui_Form(object):
         self.pushButton.setText(QCoreApplication.translate("Form", u"START GAME", None))
         #self.pushButton_2.setText(QCoreApplication.translate("Form", u"JOIN GAME", None))
         self.pushButton_3.setText(QCoreApplication.translate("Form", u"PLAY WITH FRIENDS", None))
-        self.pushButton_4.setText(QCoreApplication.translate("Form", u"HOME PAGE", None))
+        self.pushButton_4.setText(QCoreApplication.translate("Form", u"HOMEPAGE", None))
         self.pushButton_5.setText(QCoreApplication.translate("Form", u"ACCOUNT", None))
         self.pushButton_6.setText(QCoreApplication.translate("Form", u"STATISTICS", None))
     # retranslateUi

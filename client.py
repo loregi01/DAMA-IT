@@ -175,6 +175,7 @@ class MainWindow(QMainWindow):
     new_friend_data_view = Signal(list)
     friends_data_view = Signal(list)
     messages_data_view = Signal(list)
+    game_ended = Signal(QMainWindow)
 
     def __init__(self):
         super().__init__()
@@ -194,6 +195,8 @@ class MainWindow(QMainWindow):
         self.homepage_window = None
         self.account_page_window = None
         self.statisticspage_window = None
+        self.globalchampionshippagewindow = None
+        self.localchampionshippagewindow = None
 
         #signal setup
         self.signup_confirmed.connect(self.on_confirm_clicked)
@@ -206,6 +209,10 @@ class MainWindow(QMainWindow):
         self.new_friend_data_view.connect(self.on_new_friend_data_view)
         self.friends_data_view.connect(self.on_friends_data_view)
         self.messages_data_view.connect(self.on_messages_data_view)
+        self.game_ended.connect(self.on_game_ended)
+
+    def on_game_ended(self):
+        self.new_window1(self.homepage_window.board)
 
     def on_messages_data_view(self, data):
         self.account_page_window.chat_window.private_chat_page.show_old_messages(data)
@@ -221,7 +228,9 @@ class MainWindow(QMainWindow):
         if self.account_page_window is not None:
             self.account_page_window.friend_window.show_friend(data)
             self.account_page_window.chat_window.show_new_friend(data)
-        self.homepage_window.playwithfriendspage.show_friend(data)
+
+        if self.homepage_window.playwithfriendspage is not None:
+            self.homepage_window.playwithfriendspage.show_friend(data)
         
     def on_local_champ_view(self):
         self.statisticspage_window.close()
@@ -239,6 +248,18 @@ class MainWindow(QMainWindow):
             self.statistic_window(self.homepage_window)
         elif currentpage == 1:
             self.statistic_window(self.account_page_window)
+        elif currentpage == 3:
+            self.statistic_window(self.globalchampionshippagewindow)
+        elif currentpage == 4:
+            self.statistic_window(self.localchampionshippagewindow)
+        elif currentpage == 5:
+            self.statistic_window(self.account_page_window.chat_window)
+        elif currentpage == 6:
+            self.statistic_window(self.account_page_window.chat_window.private_chat_page)
+        elif currentpage == 7:
+            self.statistic_window(self.account_page_window.friend_window)
+        elif currentpage == 8:
+            self.statistic_window(self.homepage_window.playwithfriendspage)
 
     def on_account_view(self):
         print("CurrentPage Account: ", str(currentpage))
@@ -246,6 +267,18 @@ class MainWindow(QMainWindow):
             self.account_window(self.homepage_window)
         elif currentpage == 2:
             self.account_window(self.statisticspage_window)
+        elif currentpage == 3:
+            self.account_window(self.globalchampionshippagewindow)
+        elif currentpage == 4:
+            self.account_window(self.localchampionshippagewindow)
+        elif currentpage == 5:
+            self.account_window(self.account_page_window.chat_window)
+        elif currentpage == 6:
+            self.account_window(self.account_page_window.chat_window.private_chat_page)
+        elif currentpage == 7:
+            self.account_window(self.account_page_window.friend_window)
+        elif currentpage == 8:
+            self.account_window(self.homepage_window.playwithfriendspage)
 
     def statistic_window (self, old_window):
         old_window.close()
@@ -369,7 +402,7 @@ class HomePage(QMainWindow):
 
     def on_showBoard(self):
         global color
-        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio)  # Create an instance of the Board class
+        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username)  # Create an instance of the Board class
         self.board.setFixedSize(QSize(900, 600))
         self.waitingpage.close()
         self.board.show()
@@ -390,6 +423,10 @@ class LocalChampionshipPage(QMainWindow):
         self.container = QWidget()
         self.layout = QVBoxLayout()
         self.on_update_champ(localChampList)
+
+        self.ui.pushButton.clicked.connect(self.home_page)
+        self.ui.pushButton_2.clicked.connect(self.account_page)
+        self.ui.pushButton_3.clicked.connect(self.statistics_page)
         #self.update_champ.connect(self.on_update_champ)
 
     def setup_ui(self):
@@ -412,6 +449,22 @@ class LocalChampionshipPage(QMainWindow):
         container.setLayout(layout)
         self.ui.scrollArea.setWidget(container)
         self.ui.scrollArea.setWidgetResizable(True)
+
+    def home_page(self):
+        global currentpage
+        currentpage = 0
+        self.close()
+        window.homepage_window.show()
+
+    def statistics_page (self):
+        global currentpage
+        currentpage = 4
+        sio.emit('Statistics', username)
+
+    def account_page (self):
+        global currentpage
+        currentpage = 4
+        sio.emit('Account', username)
 
 class RectWidget(QWidget):
     def __init__(self, username, elo):
@@ -444,6 +497,10 @@ class GlobalChampionshipPage(QMainWindow):
         self.layout = QVBoxLayout()
         self.on_update_champ(globalChampList)
         #self.update_champ.connect(self.on_update_champ)
+        self.ui.pushButton.clicked.connect(self.home_page)
+        self.ui.pushButton_2.clicked.connect(self.account_page)
+        self.ui.pushButton_3.clicked.connect(self.statistics_page)
+        
 
     def setup_ui(self):
         self.ui = Ui_GlobalChampionshipPage()  # Inizializza Ui_Form
@@ -465,6 +522,22 @@ class GlobalChampionshipPage(QMainWindow):
         container.setLayout(layout)
         self.ui.scrollArea.setWidget(container)
         self.ui.scrollArea.setWidgetResizable(True)
+
+    def home_page(self):
+        global currentpage
+        currentpage = 0
+        self.close()
+        window.homepage_window.show()
+
+    def statistics_page (self):
+        global currentpage
+        currentpage = 3
+        sio.emit('Statistics', username)
+
+    def account_page (self):
+        global currentpage
+        currentpage = 3
+        sio.emit('Account', username)
 
 
 class StatisticsPage(QMainWindow):
@@ -550,6 +623,8 @@ class AccountPage(QMainWindow):
         window.homepage_window.show()
 
     def statistics_page(self):
+        global currentpage
+        currentpage = 1
         #self.close()
         sio.emit('Statistics', username)
         #window.account_page_window.close()
@@ -713,9 +788,13 @@ class FriendsPage(QMainWindow):
         window.homepage_window.show()
 
     def account_page(self):
+        global currentpage
+        currentpage = 7
         sio.emit('Account', username)
     
     def statistics_page(self):
+        global currentpage
+        currentpage = 7
         sio.emit('Statistics', username)
 
 
@@ -808,7 +887,7 @@ class PlayWithFriendsPage(QMainWindow):
 
     def on_showBoard(self):
         global color
-        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio)  # Create an instance of the Board class
+        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username)  # Create an instance of the Board class
         self.board.setFixedSize(QSize(900, 600))
         self.waiting_page.close()
         self.board.show()
@@ -889,9 +968,13 @@ class PlayWithFriendsPage(QMainWindow):
         window.homepage_window.show()
 
     def account_page(self):
+        global currentpage
+        currentpage = 8
         sio.emit('Account', username)
     
     def statistics_page(self):
+        global currentpage
+        currentpage = 8
         sio.emit('Statistics', username)
 
 class PrivateChatPage(QMainWindow):
@@ -966,9 +1049,13 @@ class PrivateChatPage(QMainWindow):
         window.homepage_window.show()
 
     def account_page(self):
+        global currentpage
+        currentpage = 6
         sio.emit('Account', username)
     
     def statistics_page(self):
+        global currentpage
+        currentpage = 6
         sio.emit('Statistics', username)
 
     def add_message(self, message, mymessage):
@@ -1113,9 +1200,13 @@ class ChatPage(QMainWindow):
         window.homepage_window.show()
 
     def account_page(self):
+        global currentpage
+        currentpage = 5
         sio.emit('Account', username)
     
     def statistics_page(self):
+        global currentpage
+        currentpage = 5
         sio.emit('Statistics', username)
 
 @sio.event
@@ -1288,6 +1379,12 @@ def localchamp(data):
     localChampList = sorted_data
     window.local_champ_view.emit(window)
     #window.statisticspage_window.globalchampionshippagewindow.on_update_champ(sorted_data)'''
+
+@sio.event
+def game_finish(data):
+    print(data)
+    if data[0] == username or data[1] == username:
+        window.game_ended.emit(window)
 
 @sio.event
 def rabbitmq_test(data):

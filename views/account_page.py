@@ -89,18 +89,20 @@ class Ui_Form(object):
 "border-color: rgb(0, 0, 0);")
         self.pushButton_2 = QPushButton(Form)
         self.pushButton_2.setObjectName(u"pushButton_2")
-        self.pushButton_2.setGeometry(QRect(0, 490, 301, 111))
-        self.pushButton_2.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton_2.setGeometry(QRect(0, 500, 301, 101))
+        self.pushButton_2.setStyleSheet(u"color: rgb(255, 255, 255);\n"
+"font: 10pt \"Times New Roman\";")
         self.pushButton_3 = QPushButton(Form)
         self.pushButton_3.setObjectName(u"pushButton_3")
         self.pushButton_3.setEnabled(False)
-        self.pushButton_3.setGeometry(QRect(300, 490, 311, 111))
-        self.pushButton_3.setStyleSheet(u"color: rgb(255, 255, 255);\n"
-"color: rgb(135, 135, 135);")
+        self.pushButton_3.setGeometry(QRect(300, 500, 301, 101))
+        self.pushButton_3.setStyleSheet(u"color: rgb(125, 125, 125);\n"
+"font: 10pt \"Times New Roman\";")
         self.pushButton_4 = QPushButton(Form)
         self.pushButton_4.setObjectName(u"pushButton_4")
-        self.pushButton_4.setGeometry(QRect(610, 490, 291, 111))
-        self.pushButton_4.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton_4.setGeometry(QRect(600, 500, 301, 101))
+        self.pushButton_4.setStyleSheet(u"color: rgb(255, 255, 255);\n"
+"font: 10pt \"Times New Roman\";")
 
         self.retranslateUi(Form)
 
@@ -116,7 +118,7 @@ class Ui_Form(object):
         self.pushButton.setText(QCoreApplication.translate("Form", u"CHANGE DATA", None))
         self.label_5.setText(QCoreApplication.translate("Form", u"Chat", None))
         self.label_6.setText(QCoreApplication.translate("Form", u"Friends", None))
-        self.pushButton_2.setText(QCoreApplication.translate("Form", u"HOME PAGE", None))
+        self.pushButton_2.setText(QCoreApplication.translate("Form", u"HOMEPAGE", None))
         self.pushButton_3.setText(QCoreApplication.translate("Form", u"ACCOUNT ", None))
         self.pushButton_4.setText(QCoreApplication.translate("Form", u"STATISTICS", None))
     # retranslateUi

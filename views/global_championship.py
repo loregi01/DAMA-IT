@@ -18,7 +18,7 @@ class Ui_Form(object):
         Form.setStyleSheet(u"background-image: url(views/graphics/background1.png);")
         self.scrollArea = QScrollArea(Form)
         self.scrollArea.setObjectName(u"scrollArea")
-        self.scrollArea.setGeometry(QRect(170, 60, 561, 451))
+        self.scrollArea.setGeometry(QRect(170, 60, 561, 400))
         self.scrollArea.setStyleSheet(u"border: 1px solid white;\n")
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
@@ -33,20 +33,19 @@ class Ui_Form(object):
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.pushButton = QPushButton(Form)
         self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setGeometry(QRect(0, 520, 301, 81))
-        self.pushButton.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton.setGeometry(QRect(0, 500, 301, 101))
+        self.pushButton.setStyleSheet(u"color: rgb(255, 255, 255);\n"
+"font: 10pt \"Times New Roman\";")
         self.pushButton_2 = QPushButton(Form)
         self.pushButton_2.setObjectName(u"pushButton_2")
-        self.pushButton_2.setGeometry(QRect(300, 520, 301, 81))
-        self.pushButton_2.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.pushButton_2.setGeometry(QRect(300, 500, 301, 101))
+        self.pushButton_2.setStyleSheet(u"color: rgb(255, 255, 255);\n"
+"font: 10pt \"Times New Roman\";")
         self.pushButton_3 = QPushButton(Form)
         self.pushButton_3.setObjectName(u"pushButton_3")
-        self.pushButton_3.setGeometry(QRect(600, 520, 301, 81))
-        self.pushButton_3.setStyleSheet(u"color: rgb(255, 255, 255);")
-        '''self.label_2 = QLabel(Form)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setGeometry(QRect(10, 0, 31, 51))
-        self.label_2.setPixmap(QPixmap(u"views/graphics/arrow.png"))'''
+        self.pushButton_3.setGeometry(QRect(600, 500, 301, 101))
+        self.pushButton_3.setStyleSheet(u"color: rgb(255, 255, 255);\n"
+"font: 10pt \"Times New Roman\";")
 
         self.retranslateUi(Form)
 
@@ -56,9 +55,8 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.label.setText(QCoreApplication.translate("Form", u"Global Championship", None))
-        self.pushButton.setText(QCoreApplication.translate("Form", u"ACCOUNT", None))
-        self.pushButton_2.setText(QCoreApplication.translate("Form", u"HOME PAGE", None))
+        self.pushButton.setText(QCoreApplication.translate("Form", u"HOMEPAGE", None))
+        self.pushButton_2.setText(QCoreApplication.translate("Form", u"ACCOUNT", None))
         self.pushButton_3.setText(QCoreApplication.translate("Form", u"STATISTICS", None))
-        #self.label_2.setText("")
     # retranslateUi
 
