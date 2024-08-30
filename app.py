@@ -147,6 +147,12 @@ def gameEnd(data):
     if client_id in connected_clients:
         del connected_clients[client_id]
     
+    winner = None
+    if game_result == 1:
+        winner = username
+    elif game_result == 2:
+        winner = opponent_user
+
     if game_result == 1:
         cursor.execute(f'SELECT Statistic FROM user WHERE Username="{username}"')
         stat_id = cursor.fetchall()[0][0]
@@ -166,7 +172,7 @@ def gameEnd(data):
         cursor.execute(f'UPDATE statistic SET SLevel = "{str(int(stat[5]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
     
-    socketio.emit('game_finish', [username, opponent_user])
+    socketio.emit('game_finish', [username, opponent_user, winner])
 
 
 

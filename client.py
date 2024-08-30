@@ -13,7 +13,7 @@ from views.board import Board
 import views.sign_up_page
 import views.login_page
 from views.waiting import Ui_MainWindow as Ui_WaitingWindow
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QScrollArea
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QScrollArea, QMessageBox
 from PySide6.QtCore import Signal, QSize, Qt, QRect, Signal
 from PySide6.QtGui import QPainter, QColor, QFont
 import sys
@@ -1384,7 +1384,14 @@ def localchamp(data):
 def game_finish(data):
     print(data)
     if data[0] == username or data[1] == username:
-        window.game_ended.emit(window)
+        if data[2] == username:
+            choice = QMessageBox.information(window, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
+            if choice == QMessageBox.Ok:
+                window.game_ended.emit(window)
+        else:
+            choice = QMessageBox.information(window, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
+            if choice == QMessageBox.Ok:
+                window.game_ended.emit(window)
 
 @sio.event
 def rabbitmq_test(data):

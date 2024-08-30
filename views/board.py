@@ -246,15 +246,15 @@ class Board(QGraphicsView):
 
         if self._gMode == "HUMAN_VS_AI":
             if self._game.wins() == 1:
-                choice = QMessageBox.information(self, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
-                if choice == QMessageBox.Ok:
-                    print("return to homepage, win")
-                    self.sio.emit('game_end', [self._username, 1])
+                #choice = QMessageBox.information(self, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
+                #if choice == QMessageBox.Ok:
+                print("return to homepage, win")
+                self.sio.emit('game_end', [self._username, 1])
             elif self._game.wins() == 2:
-                choice = QMessageBox.information(self, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
-                if choice == QMessageBox.Ok:
-                    print("return to homepage, lose")
-                    self.sio.emit('game_end', [self._username, 2])
+                #choice = QMessageBox.information(self, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
+                #if choice == QMessageBox.Ok:
+                print("return to homepage, lose")
+                self.sio.emit('game_end', [self._username, 2])
 
     def display_cells(self, xy_s, xy_n):
         if not self._game.isThinking():
