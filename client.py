@@ -601,6 +601,7 @@ class AccountPage(QMainWindow):
         self.ui.label_6.mousePressEvent = self.on_friend_clicked
         self.ui.label_5.mousePressEvent = self.on_chat_clicked
 
+
     def setup_ui(self, friend=False):
 
         self.ui = Ui_AccountPage()  # Inizializza Ui_Form

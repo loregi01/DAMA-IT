@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QMessageBox
+from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QMessageBox, QPushButton, QGraphicsProxyWidget, QLabel
 from PySide6.QtGui import QColor#, QTextStream
 from PySide6.QtCore import Qt, QRectF, QFile, QObject, Signal, Slot
 import json
@@ -32,12 +32,56 @@ class Board(QGraphicsView):
 
         self.setBackgroundBrush(QColor(139, 69, 19))
         self._scene = QGraphicsScene()
-        self.setScene(self._scene)
         self.setInteractive(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.reset(up, turn)
         self.resizeEvent(None)
+
+        # Creazione del pulsante
+        self.button = QPushButton("WITHDRAW")
+        self.button.setFixedSize(120, 50)
+        self.button.clicked.connect(self.on_button_click)
+        self.button.setStyleSheet("""QPushButton {
+                                            border: 2px solid black;       
+                                            background-color: white;     
+                                            color: black;                
+                                            padding: 10px;                   
+                                        }
+                                        QPushButton:hover {
+                                            background-color: lightgray; 
+                                        }
+                                    """)
+        #self.button.clicked.connect(self.on_button_click)
+
+        # Aggiunta del pulsante alla scena tramite QGraphicsProxyWidget
+        self.proxy_widget = QGraphicsProxyWidget()
+        self.proxy_widget.setWidget(self.button)
+
+        # Posizionamento del pulsante in alto a destra
+        self.proxy_widget.setPos(self._scene.width() - self.button.width() + 190, 10)
+        self._scene.addItem(self.proxy_widget)
+        # Creazione della label in basso a sinistra
+        self.label = QLabel(username)
+        self.label.setFixedSize(180, 60)
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setStyleSheet("""QLabel {
+                                            border: 2px solid black;       
+                                            background-color: rgb(139, 69, 19);     
+                                            color: black;                
+                                            font-size: 20px;        
+                                        }
+                                    """)
+
+        self.proxy_widget_label = QGraphicsProxyWidget()
+        self.proxy_widget_label.setWidget(self.label)
+        self.proxy_widget_label.setPos(-200, self._scene.height() - self.label.height() - 10)
+        self._scene.addItem(self.proxy_widget_label)
+        self.setScene(self._scene)
+
+
+    def on_button_click (self):
+        self.sio.emit('withdraw',self._username)
 
     def resizeEvent(self, e):
         self.fitInView(self._scene.sceneRect(), Qt.KeepAspectRatio)
