@@ -175,7 +175,7 @@ class MainWindow(QMainWindow):
     new_friend_data_view = Signal(list)
     friends_data_view = Signal(list)
     messages_data_view = Signal(list)
-    game_ended = Signal(QMainWindow)
+    game_ended = Signal(QMainWindow,bool)
 
     def __init__(self):
         super().__init__()
@@ -211,8 +211,15 @@ class MainWindow(QMainWindow):
         self.messages_data_view.connect(self.on_messages_data_view)
         self.game_ended.connect(self.on_game_ended)
 
-    def on_game_ended(self):
-        self.new_window1(self.homepage_window.board)
+    def on_game_ended(self,w,flag):
+        if flag:
+            choice = QMessageBox.information(self.homepage_window.board, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
+            if choice == QMessageBox.Ok:
+                self.new_window1(self.homepage_window.board)
+        else:
+            choice = QMessageBox.information(self.homepage_window.board, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
+            if choice == QMessageBox.Ok:
+                self.new_window1(self.homepage_window.board)
 
     def on_messages_data_view(self, data):
         self.account_page_window.chat_window.private_chat_page.show_old_messages(data)
@@ -1385,13 +1392,13 @@ def game_finish(data):
     print(data)
     if data[0] == username or data[1] == username:
         if data[2] == username:
-            choice = QMessageBox.information(window, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
-            if choice == QMessageBox.Ok:
-                window.game_ended.emit(window)
+            #choice = QMessageBox.information(window, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
+            #if choice == QMessageBox.Ok:
+            window.game_ended.emit(window,True)
         else:
-            choice = QMessageBox.information(window, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
-            if choice == QMessageBox.Ok:
-                window.game_ended.emit(window)
+            #choice = QMessageBox.information(window, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
+            #if choice == QMessageBox.Ok:
+            window.game_ended.emit(window,False)
 
 @sio.event
 def rabbitmq_test(data):
