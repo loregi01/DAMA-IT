@@ -50,10 +50,9 @@ CREATE TABLE play (
     Player2 int NOT NULL,
     PDateTime varchar(100) NOT NULL,
     WhitePlayer int NOT NULL,
-    MinGameDuration varchar(100) NOT NULL,
-    MaxGameDuration varchar(100) NOT NULL,
-    MinOpponentScore varchar(100) NOT NULL,
-    MaxOpponentScore varchar(100) NOT NULL,
+    Winner varchar(100) NOT NULL,
+    Elo1 varchar(100) NOT NULL,
+    Elo2 varchar(100) NOT NULL,
     PRIMARY KEY (PlayID),
     FOREIGN KEY (Player1) REFERENCES user (UserID),
     FOREIGN KEY (Player2) REFERENCES user (UserID)
