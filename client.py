@@ -1017,6 +1017,7 @@ class PrivateChatPage(QMainWindow):
         # Layout principale verticale
         self.mainLayout = QVBoxLayout()
         self.mainLayout.setSpacing(0)  # Imposta lo spazio tra i messaggi
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
 
 
         # Crea e aggiungi i widget alternati
@@ -1069,6 +1070,7 @@ class PrivateChatPage(QMainWindow):
     def add_message(self, message, mymessage):
         #message = self.input_field.text()
         self.mainLayout.setSpacing(0)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
         if message:
             if mymessage:
                 rect_widget = RectWidget2(message)
