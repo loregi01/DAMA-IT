@@ -7,6 +7,3 @@ To navigate the web app, you have to look at localhost:5000 <br>
 - docker ps<br>
 - docker exec -it nome_del_container mysql -u tuo_utente -p<br>
 - use db;<br>
-<p align="center">
-  <img src="architecture.png" width="700" title="hover text">
-</p>
