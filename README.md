@@ -21,7 +21,7 @@ what follows is an overview of what is in place once you've done all the steps a
 <p align="center">
   <img src="architecture.png" width="700" title="hover text">
 </p>
-<br>
+
 ## Author
 [Lorenzo Russo](https://github.com/lorenzoR21)
 [Lorenzo Gizzi](https://github.com/loregi01)
