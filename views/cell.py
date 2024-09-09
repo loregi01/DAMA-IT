@@ -17,8 +17,7 @@ class Cell(QGraphicsRectItem):
     color_over = QColor(255, 228, 181)
     color_selected = QColor(255, 255, 0)
 
-    #graphics
-    pieces = []  # Assuming this will be initialized somewhere in the code
+    pieces = []  
     
     from views.board import Board
     def __init__(self, board: Board, bx: int, by: int):
@@ -68,27 +67,11 @@ class Cell(QGraphicsRectItem):
                 self._board._cells[i][j].setSuggested(False)
 
     def mouseMoveEvent(self, event):
-        #if self._board._game.isThinking():
-        #    return
         
         if self._board._cells[self._y][self._x]._content == Cell.EMPTY:
             return
 
-        '''if self._board.forced_cells():
-            continuare = False
-            for c in self._board._game._forced_moves:
-                if self._x == c.front() % 8 and self._y == c.front() / 8:
-                    continuare = True
-            if not continuare:
-                return
-'''
         self._selected = True
-
-        '''if self._board._game.pieceBoard()[self._y][self._x]:
-            pMove = self._board._game.pieceBoard()[self._y][self._x]._possibleMove()
-            for move in pMove:
-                self._board._cells[move.second][move.first].setSelected(True)
-                '''
         
         self._draggable = True
         self.update()
@@ -106,11 +89,7 @@ class Cell(QGraphicsRectItem):
         doMove = False
         if self._draggable:
             pMove = self._board._game.pieceBoard()[self._y][self._x]._possibleMove()
-            print("pMove", pMove)
             colItems = self.collidingItems()
-            #print("WE")
-            #print(colItems)
-            #if colItems.isEmpty():
             if not colItems:
                 self._x = QPointF(self.scenePos()).x()
                 self._y = QPointF(self.scenePos()).y()

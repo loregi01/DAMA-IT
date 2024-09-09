@@ -40,7 +40,6 @@ class Game:
             self._isThinking = True
         else:
             self._isThinking = False
-        #self._difficulty = difficulty
         self._moves = []
         self._forced_moves = []
         self._black_pieces_left = []
@@ -62,12 +61,6 @@ class Game:
                 elif j % 2 == 0 and i == 6:
                     self._pieceBoard[i][j] = Checker(j, i, True, self._pieceBoard)
                     self._white_pieces_left.append(i * self._n + j)
-        
-        #if not first_player and difficulty != 0:
-        #    self.start()
-
-    #def run(self):
-    #    pass
 
     def transform(self, x: int, y: int) -> bool:
         x = int(x)
@@ -136,7 +129,6 @@ class Game:
                 vp.pop(0)
 
         boolMove, ate = self._pieceBoard[y0][x0].moveTo(x1, y1, ate)
-        #print("BOOL MOVE", boolMove)
 
         if not boolMove:
             return False, multiple_eat
@@ -168,7 +160,6 @@ class Game:
             self._white_pieces_left.append(y1 * self._n + x1)
             self._white_pieces_left.remove(y0 * self._n + x0)
 
-        #change turn, solo se non è in corso una mangiata multipla
         if not multiple_eat:
             self._myTurn = not self._myTurn
 
@@ -178,7 +169,6 @@ class Game:
         y0 = int(y0)
         x1 = int(x1)
         y1 = int(y1)        
-        #coordinates of eat piece
         xy0 = y0 * 8 + x0
         xy1 = y1 * 8 + x1
         a = abs(xy1 - xy0) // 2
@@ -233,9 +223,7 @@ class Game:
         y_start = int(y_start)
 
         if not self._pieceBoard[y_start][x_start].can_eat():
-            #print("not eat")
             return False, l, n_king, paths
-        #print("eat")
         i = 0
         n = 0
         app = 0
@@ -323,7 +311,6 @@ class Game:
             if multiple_eat_piece:
                 if x_start == multiple_eat_piece[-1][0] % self._n and y_start == multiple_eat_piece[-1][0] // self._n and multiple_eat_piece[-1][1] != 1:
                     multiple_eat_piece[-1][1] -= 1
-            #print("app_path", app_path)
             paths.append(app_path[:])
 
             n += 1
@@ -355,8 +342,6 @@ class Game:
 
         i = 0
         copy_paths = paths[:]
-        #print("copy path", copy_paths)
-        #print("paths", paths)
         for q in copy_paths:
             if len(q) != l:
                 paths.remove(q)
@@ -368,7 +353,6 @@ class Game:
     
     def eat_rules(self):
         self._forced_moves.clear()
-        #print("turn", self._myTurn)
         if self._myTurn:
             ctr = self._white_pieces_left
         else:
@@ -384,10 +368,6 @@ class Game:
             app_best.clear()
 
             boolBestEat, lung_eat, n_king, app_best = self.best_eat(p % self._n, p // self._n, lung_eat, n_king, app_best)
-            #print("p", p)
-            #print("lung_eat", lung_eat)
-            #print("n_king", n_king)
-            #print("app_best", app_best)
             if boolBestEat:
                 if lung_eat > app_lung_eat:
                     app_lung_eat = lung_eat

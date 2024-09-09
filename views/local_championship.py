@@ -50,7 +50,6 @@ class Ui_Form(object):
         self.retranslateUi(Form)
 
         QMetaObject.connectSlotsByName(Form)
-    # setupUi
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
@@ -58,5 +57,4 @@ class Ui_Form(object):
         self.pushButton.setText(QCoreApplication.translate("Form", u"HOMEPAGE", None))
         self.pushButton_2.setText(QCoreApplication.translate("Form", u"ACCOUNT", None))
         self.pushButton_3.setText(QCoreApplication.translate("Form", u"STATISTICS", None))
-    # retranslateUi
 

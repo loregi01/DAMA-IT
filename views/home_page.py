@@ -32,10 +32,6 @@ class Ui_Form(object):
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setGeometry(QRect(340, 225, 221, 61))
         self.pushButton.setStyleSheet(u"color: rgb(255, 255, 255);")
-        '''self.pushButton_2 = QPushButton(Form)
-        self.pushButton_2.setObjectName(u"pushButton_2")
-        self.pushButton_2.setGeometry(QRect(340, 240, 221, 61))
-        self.pushButton_2.setStyleSheet(u"color: rgb(255, 255, 255);")'''
         self.pushButton_3 = QPushButton(Form)
         self.pushButton_3.setObjectName(u"pushButton_3")
         self.pushButton_3.setGeometry(QRect(340, 305, 221, 61))
@@ -60,17 +56,14 @@ class Ui_Form(object):
         self.retranslateUi(Form)
 
         QMetaObject.connectSlotsByName(Form)
-    # setupUi
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.label.setText(QCoreApplication.translate("Form", u"DAMA-IT", None))
         self.label_3.setText(QCoreApplication.translate("Form", u"Hi, Lorenzo", None))
         self.pushButton.setText(QCoreApplication.translate("Form", u"START GAME", None))
-        #self.pushButton_2.setText(QCoreApplication.translate("Form", u"JOIN GAME", None))
         self.pushButton_3.setText(QCoreApplication.translate("Form", u"PLAY WITH FRIENDS", None))
         self.pushButton_4.setText(QCoreApplication.translate("Form", u"HOMEPAGE", None))
         self.pushButton_5.setText(QCoreApplication.translate("Form", u"ACCOUNT", None))
         self.pushButton_6.setText(QCoreApplication.translate("Form", u"STATISTICS", None))
-    # retranslateUi
 

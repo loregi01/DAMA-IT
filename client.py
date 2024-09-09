@@ -31,7 +31,6 @@ sio = socketio.Client()
 
 Uname = ""
 
-#data logged user
 firstName = ""
 surname = ""
 email = ""
@@ -40,7 +39,6 @@ birthdate = ""
 color = None
 friends = False
 
-#User stats
 stats = None
 openStatisticPage = False
 
@@ -57,42 +55,31 @@ class SignUp(QMainWindow):
         self.new_window_instance = None
         self.setup_ui()
         self.ui.confirm_button.clicked.connect(self.send_credentials)
-        #self.ui.confirm_button.clicked.connect(self.on_confirm_clicked)
         self.ui.go_back_label.mousePressEvent = self.on_go_back_label_clicked
 
     def new_window(self):
         self.close()
         window.show()
-        #self.new_window_instance = HomePage()
-        #self.new_window_instance = MainWindow()
-        #window.homepage_window = self.new_window_instance  
-        #self.new_window_instance.show()
 
     def on_confirm_clicked(self):
-        print("Confirm button clicked")
         self.new_window()
 
     def main_window(self):
-        self.close()
-        #self.new_window_instance = SignIn()
-        #global signup_window
-        #self.signup_window = new_window_instance  
+        self.close() 
         self.signup_window = MainWindow()  
         self.signup_window.show()
 
     def on_go_back_label_clicked(self, event):
-        print("Sign In label clicked")
         self.main_window()
 
     def setup_ui(self):
-        self.ui = Ui_Form()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_Form()  
+        self.ui.setupUi(self) 
 
     def send_credentials(self):
         self.ui.retrieve_credentials()
         name = self.ui.Rname
         if len(name) < 2:
-            print("Nome troppo corto")
             self.ui.first_name.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
             self.ui.first_name.setText("")
             self.ui.first_name.setPlaceholderText("Name too short")
@@ -101,7 +88,6 @@ class SignUp(QMainWindow):
         name = name[0].upper() + name[1:]
         surname = self.ui.Rsurname
         if len(surname) < 2:
-            print("Cognome troppo corto")
             self.ui.surname.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
             self.ui.surname.setText("")
             self.ui.surname.setPlaceholderText("Surname too short")
@@ -112,7 +98,6 @@ class SignUp(QMainWindow):
         global Semail
         Semail = self.ui.Remail
         if '@' not in email:
-            print('email non corretta')
             self.ui.email.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
             self.ui.email.setText("")
             self.ui.email.setPlaceholderText("Missing @")
@@ -120,7 +105,6 @@ class SignUp(QMainWindow):
         self.ui.email.setStyleSheet("border: 2px solid white; border-radius: 10px; color: white;")
         birthdate = self.ui.Rbirthdate
         if len(birthdate.split('/')) != 3:
-            print('data non corretta')
             self.ui.birthdate.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
             self.ui.birthdate.setText("")
             self.ui.birthdate.setPlaceholderText("DD/MM/YYYY")
@@ -129,7 +113,6 @@ class SignUp(QMainWindow):
         password = self.ui.Rpassword
         confirm_passwrd = self.ui.RConfirmPassword
         if password != confirm_passwrd or password == "":
-            print("Password diverse")
             self.ui.password.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
             self.ui.confirm_password.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
             return
@@ -137,7 +120,6 @@ class SignUp(QMainWindow):
         self.ui.confirm_password.setStyleSheet("border: 2px solid white; border-radius: 10px; color: white;")
         username = self.ui.RUsername
         if len(username) < 1:
-            print("Username troppo corto")
             self.ui.username.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
             self.ui.username.setText("")
             self.ui.username.setPlaceholderText("Username")
@@ -149,9 +131,7 @@ class SignUp(QMainWindow):
         password = hash_object.hexdigest()
 
         data = {'name': name, 'surname': surname, 'email': email, 'password': password, 'username': username, 'birthdate': birthdate}
-        print(f"My credentials sent... name:{name}, surname:{surname}, email:{email}, birthdate:{birthdate}, password:{password}, username:{username}")
         
-        print("Confirm button clicked")
         self.new_window()
         
         sio.emit('credentials', data)
@@ -164,7 +144,6 @@ class SignUp(QMainWindow):
 
 class MainWindow(QMainWindow):
 
-    #signal for comunicate between thread
     signup_confirmed = Signal(QMainWindow)
     login_success_signal = Signal(QMainWindow)
     login_unsuccess = Signal(QMainWindow)
@@ -184,7 +163,6 @@ class MainWindow(QMainWindow):
             sio.connect('http://127.0.0.1:5000')
             #sio.connect('http://192.168.232.16:5000')
 
-        # Inizializza l'interfaccia utente generata da Qt Designer
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -198,7 +176,6 @@ class MainWindow(QMainWindow):
         self.globalchampionshippagewindow = None
         self.localchampionshippagewindow = None
 
-        #signal setup
         self.signup_confirmed.connect(self.on_confirm_clicked)
         self.login_success_signal.connect(self.on_confirm_clicked)
         self.login_unsuccess.connect(self.on_login_unsuccess)   
@@ -225,13 +202,11 @@ class MainWindow(QMainWindow):
         self.account_page_window.chat_window.private_chat_page.show_old_messages(data)
 
     def on_new_friend_data_view(self, data):
-        print(data)
         if self.account_page_window is not None:
             self.account_page_window.friend_window.show_new_friend(data)
         self.homepage_window.playwithfriendspage.show_new_friend(data)
 
     def on_friends_data_view(self, data):
-        print(data)
         if self.account_page_window is not None:
             self.account_page_window.friend_window.show_friend(data)
             self.account_page_window.chat_window.show_new_friend(data)
@@ -250,7 +225,6 @@ class MainWindow(QMainWindow):
         self.globalchampionshippagewindow.show()
 
     def on_statistic_view (self):
-        print("CurrentPage Statistic: ", str(currentpage))
         if currentpage == 0:   
             self.statistic_window(self.homepage_window)
         elif currentpage == 1:
@@ -269,7 +243,6 @@ class MainWindow(QMainWindow):
             self.statistic_window(self.homepage_window.playwithfriendspage)
 
     def on_account_view(self):
-        print("CurrentPage Account: ", str(currentpage))
         if currentpage == 0:   
             self.account_window(self.homepage_window)
         elif currentpage == 2:
@@ -314,19 +287,14 @@ class MainWindow(QMainWindow):
         self.homepage_window.user_field.setText(f"Hi, {username}")
 
     def on_confirm_clicked(self, old_window):
-        print("Confirm button clicked from MainWindow after comunication with server")
         self.new_window1(old_window)
 
     def new_window(self):
-        self.close()
-        #self.new_window_instance = SignIn()
-        #global signup_window
-        #self.signup_window = new_window_instance  
+        self.close() 
         self.signup_window = SignUp()  
         self.signup_window.show()
 
     def on_signin_clicked(self, event):
-        print("Sign In label clicked")
         self.new_window()
 
     def send_credentials(self):
@@ -336,7 +304,6 @@ class MainWindow(QMainWindow):
         data = {}
         data['email'] = email
         data['password'] = password
-        print(f"My credentials sent... email:{email}, pass:{password}")
         sio.emit('login_credentials', data)
 
 class HomePage(QMainWindow):
@@ -355,37 +322,22 @@ class HomePage(QMainWindow):
         self.accountpage_window = None
         self.playwithfriendspage = None
         self.waitingpage = None
-        #self.playwithfriendspage = PlayWithFriendsPage()
 
         self.update_board.connect(self.on_update_board)
         self.showBoard.connect(self.on_showBoard)
 
     def on_update_board(self, data):
-        #self.board._game._pieceBoard = data
-        print("From on_update_board", data)
-        #self.board._game._isThinking = False
-        #self.board._game._myTurn = True
         self.board.updateBoard_fromOpponent(data)
 
-    '''def setup_ui(self):
-        self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
-        total_games=stats[0][1]
-        total_wins=stats[0][2]
-        elo=stats[0][4]
-        level=stats[0][5]
-        self.ui.info_label.setText(f"Total Games: {total_games}\nTotal Wins: {total_wins}\nELO: {elo}\nLevel: {level}")'''
-
     def statistics_page (self):
-        #Retrieve data for the page
         sio.emit('Statistics', username)
 
     def account_page (self):
         sio.emit('Account', username)
 
     def setup_ui(self):
-        self.ui = Ui_HomePage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_HomePage()  
+        self.ui.setupUi(self) 
         self.user_field = self.ui.label_3
         global currentpage
         currentpage = 0
@@ -409,7 +361,7 @@ class HomePage(QMainWindow):
 
     def on_showBoard(self):
         global color
-        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username)  # Create an instance of the Board class
+        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username)  
         self.board.setFixedSize(QSize(900, 600))
         self.waitingpage.close()
         self.board.show()
@@ -420,8 +372,8 @@ class WaitingPage(QMainWindow):
         self.setup_ui()
 
     def setup_ui(self):
-        self.ui = Ui_WaitingWindow()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_WaitingWindow() 
+        self.ui.setupUi(self)  
 
 class LocalChampionshipPage(QMainWindow):
     def __init__(self):
@@ -434,21 +386,17 @@ class LocalChampionshipPage(QMainWindow):
         self.ui.pushButton.clicked.connect(self.home_page)
         self.ui.pushButton_2.clicked.connect(self.account_page)
         self.ui.pushButton_3.clicked.connect(self.statistics_page)
-        #self.update_champ.connect(self.on_update_champ)
 
     def setup_ui(self):
-        self.ui = Ui_LocalChampionshipPage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_LocalChampionshipPage()  
+        self.ui.setupUi(self) 
     
     def on_update_champ(self, data):
-        print(data)
         container = QWidget()
         layout = QVBoxLayout()
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(0)
 
-        #print(data[0])
-        # Aggiungi i rettangoli al layout
         for value in data:
             rect_widget = RectWidget(value[0], value[1])
             layout.addWidget(rect_widget)
@@ -477,25 +425,20 @@ class RectWidget(QWidget):
     def __init__(self, username, elo):
         super().__init__()
 
-        # Create layout
         layout = QVBoxLayout()
 
-        # Create and style labels
         username_label = QLabel(f"Username: {username}\nELO: {elo}")
         username_label.setStyleSheet("color: white; font-size:15px;padding-left:10px")
         layout.addWidget(username_label)
 
-        # Set widget style
         self.setAutoFillBackground(True)
         self.setStyleSheet("background-color: black; border: 2px solid white;")
 
-        # Set layout to widget
         self.setLayout(layout)
 
         self.setFixedSize(500, 100)
 
 class GlobalChampionshipPage(QMainWindow):
-    #update_champ = Signal(QMainWindow)
         
     def __init__(self):
         super().__init__()
@@ -503,25 +446,21 @@ class GlobalChampionshipPage(QMainWindow):
         self.container = QWidget()
         self.layout = QVBoxLayout()
         self.on_update_champ(globalChampList)
-        #self.update_champ.connect(self.on_update_champ)
         self.ui.pushButton.clicked.connect(self.home_page)
         self.ui.pushButton_2.clicked.connect(self.account_page)
         self.ui.pushButton_3.clicked.connect(self.statistics_page)
         
 
     def setup_ui(self):
-        self.ui = Ui_GlobalChampionshipPage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_GlobalChampionshipPage()  
+        self.ui.setupUi(self)  
     
     def on_update_champ(self, data):
-        print(data)
         container = QWidget()
         layout = QVBoxLayout()
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(0)
 
-        print(data[0])
-        # Aggiungi i rettangoli al layout
         for value in data:
             rect_widget = RectWidget(value[0], value[1])
             layout.addWidget(rect_widget)
@@ -560,8 +499,8 @@ class StatisticsPage(QMainWindow):
         self.ui.account_button.clicked.connect(self.account_page)
 
     def setup_ui(self):
-        self.ui = Ui_StatisticsPage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_StatisticsPage() 
+        self.ui.setupUi(self)  
         total_games=stats[0][1]
         total_wins=stats[0][2]
         elo=stats[0][4]
@@ -584,9 +523,7 @@ class StatisticsPage(QMainWindow):
         window.homepage_window.show()
 
     def account_page(self):
-        #self.close()
         sio.emit('Account', username)
-        #window.statisticspage_window.close()
 
 class AccountPage(QMainWindow):
     def __init__(self):
@@ -604,8 +541,8 @@ class AccountPage(QMainWindow):
 
     def setup_ui(self, friend=False):
 
-        self.ui = Ui_AccountPage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_AccountPage()  
+        self.ui.setupUi(self)  
         self.ui.label.setText(f"{firstName}")
         self.ui.label_2.setText(f"{surname}")
         level = stats[0][5]
@@ -633,27 +570,21 @@ class AccountPage(QMainWindow):
     def statistics_page(self):
         global currentpage
         currentpage = 1
-        #self.close()
         sio.emit('Statistics', username)
-        #window.account_page_window.close()
 
 class RectWidget1(QWidget):
     def __init__(self, name, surname, username):
         super().__init__()
 
-        # Create layout
         layout = QVBoxLayout()
 
-        # Create and style labels
         username_label = QLabel(f"Username: {username}\nName: {name}\nSurname: {surname}")
         username_label.setStyleSheet("color: black;")
         layout.addWidget(username_label)
 
-        # Set widget style
         self.setAutoFillBackground(True)
         self.setStyleSheet("background-color: white; border-radius: 10px; border: 2px solid black;")
 
-        # Set layout to widget
         self.setLayout(layout)
 
         self.setFixedSize(375, 80)
@@ -662,20 +593,15 @@ class RectWidget2(QWidget):
     def __init__(self, message):
         super().__init__()
 
-        # Create layout
         layout = QVBoxLayout()
 
-        # Create and style labels
         username_label = QLabel(f"{message}\n")
         username_label.setStyleSheet("color: black;")
         layout.addWidget(username_label)
 
-        #layout.addLayout(layout)
-        # Set widget style
         self.setAutoFillBackground(True)
         self.setStyleSheet("background-color: white; border-radius: 10px; border: 2px solid black;")
 
-        # Set layout to widget
         self.setLayout(layout)
 
         self.setFixedSize(200, 50)
@@ -694,8 +620,8 @@ class FriendsPage(QMainWindow):
         self.ui.search.clicked.connect(self.search_friend)
 
     def setup_ui(self):
-        self.ui = Ui_FriendsPage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_FriendsPage()  
+        self.ui.setupUi(self)  
 
         global currentpage
         currentpage = 2
@@ -716,7 +642,6 @@ class FriendsPage(QMainWindow):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(10)
-        print(len(data))
         if len(data) > 1:
             h_layout = QHBoxLayout()
             label = QLabel("No user found")
@@ -724,16 +649,12 @@ class FriendsPage(QMainWindow):
             h_layout.addWidget(label)
             layout.addLayout(h_layout)
         else:
-            # Itera su ciascun valore nei dati ricevuti
             for value in data:
-                # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
                 h_layout = QHBoxLayout()
 
-                # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
                 rect_widget = RectWidget1(value[1], value[2], value[5])
 
-                # Crea il pulsante associato al valore corrente
-                button = QPushButton("Follow")  # Usa value[1] per il testo del pulsante, ad esempio
+                button = QPushButton("Follow")  
                 button.setStyleSheet("""QPushButton {
                                             border: 2px solid black;       
                                             background-color: white;     
@@ -746,14 +667,11 @@ class FriendsPage(QMainWindow):
                                         }
                                     """)
 
-                # Connetti il pulsante a un metodo che esegue un'azione
                 button.clicked.connect(lambda checked, v=value[5]: self.on_friend_button_clicked(v))
 
-                # Aggiungi RectWidget1 e il pulsante al layout orizzontale
                 h_layout.addWidget(rect_widget)
                 h_layout.addWidget(button)
 
-                # Aggiungi il layout orizzontale al layout principale
                 layout.addLayout(h_layout)
 
         container.setLayout(layout)
@@ -761,7 +679,6 @@ class FriendsPage(QMainWindow):
         self.ui.scrollArea.setWidgetResizable(True)
 
     def on_friend_button_clicked(self, value_friend):
-        print(f"Pulsante cliccato per l'amico: {value_friend}")  # Esegui un'azione specifica con i dati dell'amico
         sio.emit('AddFriend', [username, value_friend])
 
     def take_friend(self):
@@ -772,7 +689,6 @@ class FriendsPage(QMainWindow):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(0)
-        # Aggiungi i rettangoli al layout
         for value in data:
             rect_widget = RectWidget1(value[0], value[1], value[2])
             layout.addWidget(rect_widget)
@@ -827,8 +743,8 @@ class PlayWithFriendsPage(QMainWindow):
         self.waiting_page = None
 
     def setup_ui(self):
-        self.ui = Ui_PlayWithFriendsPage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_PlayWithFriendsPage()  
+        self.ui.setupUi(self) 
 
         global currentpage
         currentpage = 2
@@ -849,7 +765,6 @@ class PlayWithFriendsPage(QMainWindow):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(10)
-        print(len(data))
         if len(data) > 1:
             h_layout = QHBoxLayout()
             label = QLabel("No user found")
@@ -857,16 +772,12 @@ class PlayWithFriendsPage(QMainWindow):
             h_layout.addWidget(label)
             layout.addLayout(h_layout)
         else:
-            # Itera su ciascun valore nei dati ricevuti
             for value in data:
-                # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
                 h_layout = QHBoxLayout()
 
-                # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
                 rect_widget = RectWidget1(value[1], value[2], value[5])
 
-                # Crea il pulsante associato al valore corrente
-                button = QPushButton("Play")  # Usa value[1] per il testo del pulsante, ad esempio
+                button = QPushButton("Play")  
                 button.setStyleSheet("""QPushButton {
                                             border: 2px solid black;       
                                             background-color: white;     
@@ -879,14 +790,11 @@ class PlayWithFriendsPage(QMainWindow):
                                         }
                                     """)
 
-                # Connetti il pulsante a un metodo che esegue un'azione
                 button.clicked.connect(lambda checked, v=value[5]: self.on_play_friend_button_clicked(v))
 
-                # Aggiungi RectWidget1 e il pulsante al layout orizzontale
                 h_layout.addWidget(rect_widget)
                 h_layout.addWidget(button)
 
-                # Aggiungi il layout orizzontale al layout principale
                 layout.addLayout(h_layout)
 
         container.setLayout(layout)
@@ -895,22 +803,17 @@ class PlayWithFriendsPage(QMainWindow):
 
     def on_showBoard(self):
         global color
-        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username)  # Create an instance of the Board class
+        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username) 
         self.board.setFixedSize(QSize(900, 600))
         self.waiting_page.close()
         self.board.show()
 
     def on_update_board(self, data):
-        #self.board._game._pieceBoard = data
-        print("From on_update_board", data)
-        #self.board._game._isThinking = False
-        #self.board._game._myTurn = True
         self.board.updateBoard_fromOpponent(data)
 
     def on_play_friend_button_clicked(self, value_friend):
         global friends
         friends = True
-        print(f"Pulsante cliccato per l'amico: {value_friend}")  # Esegui un'azione specifica con i dati dell'amico
         sio.emit('PlayFriend', [username, value_friend])
         self.close()
         self.waiting_page = WaitingPage()
@@ -925,16 +828,12 @@ class PlayWithFriendsPage(QMainWindow):
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(10)
 
-        # Itera su ciascun valore nei dati ricevuti
         for value in data:
-            # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
             h_layout = QHBoxLayout()
 
-            # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
             rect_widget = RectWidget1(value[0], value[1], value[2])
 
-            # Crea il pulsante associato al valore corrente
-            button = QPushButton("Play")  # Usa value[1] per il testo del pulsante, ad esempio
+            button = QPushButton("Play")  
             button.setStyleSheet("""QPushButton {
                                             border: 2px solid black;       
                                             background-color: white;     
@@ -947,14 +846,11 @@ class PlayWithFriendsPage(QMainWindow):
                                         }
                                     """)
 
-            # Connetti il pulsante a un metodo che esegue un'azione
             button.clicked.connect(lambda checked, v=value[0]: self.on_play_friend_button_clicked(v))
 
-            # Aggiungi RectWidget1 e il pulsante al layout orizzontale
             h_layout.addWidget(rect_widget)
             h_layout.addWidget(button)
 
-            # Aggiungi il layout orizzontale al layout principale
             layout.addLayout(h_layout)
 
         container.setLayout(layout)
@@ -1009,37 +905,19 @@ class PrivateChatPage(QMainWindow):
         self.message_view.connect(self.add_message)
 
     def setup_ui(self):
-        self.ui = Ui_PrivateChatPage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_PrivateChatPage()  
+        self.ui.setupUi(self) 
 
         self.container = QWidget()
 
-        # Layout principale verticale
         self.mainLayout = QVBoxLayout()
-        self.mainLayout.setSpacing(0)  # Imposta lo spazio tra i messaggi
+        self.mainLayout.setSpacing(0)  
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
 
-
-        # Crea e aggiungi i widget alternati
-        '''rect_widget1 = RectWidget2("ProvaLeft")
-        rect_widget2 = RectWidget2("ProvaRight")
-        rect_widget3 = RectWidget2("ProvaLeft")
-        rect_widget4 = RectWidget2("ProvaRight")
-
-        # Imposta l'allineamento di ogni widget, simulando una chat alternata
-        mainLayout.addWidget(rect_widget1, alignment=Qt.Alignment.AlignLeft)
-        mainLayout.addWidget(rect_widget2, alignment=Qt.Alignment.AlignRight)
-        mainLayout.addWidget(rect_widget3, alignment=Qt.Alignment.AlignLeft)
-        mainLayout.addWidget(rect_widget4, alignment=Qt.Alignment.AlignRight)'''
-
-        # Imposta il layout principale al container
         self.container.setLayout(self.mainLayout)
 
-        # Imposta il widget container nello ScrollArea
         self.ui.scrollArea_2.setWidget(self.container)
         self.ui.scrollArea_2.setWidgetResizable(True)
-        #global currentpage
-        #currentpage = 2
 
     def show_old_messages(self, messages):
         for m in messages:
@@ -1068,7 +946,6 @@ class PrivateChatPage(QMainWindow):
         sio.emit('Statistics', username)
 
     def add_message(self, message, mymessage):
-        #message = self.input_field.text()
         self.mainLayout.setSpacing(0)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         if message:
@@ -1078,9 +955,7 @@ class PrivateChatPage(QMainWindow):
             else:
                 rect_widget = RectWidget2(message)
                 self.mainLayout.addWidget(rect_widget, alignment=Qt.Alignment.AlignLeft)
-            #self.input_field.clear()
-
-            # Scorri automaticamente verso il basso
+            
             self.ui.scrollArea_2.verticalScrollBar().setValue(self.ui.scrollArea_2.verticalScrollBar().maximum())
 
 
@@ -1097,7 +972,6 @@ class PrivateChatPage(QMainWindow):
         if sender != username:
             self.message_view.emit(message, False)
 
-        print(message)
 
 class ChatPage(QMainWindow):
     def __init__(self):
@@ -1115,8 +989,8 @@ class ChatPage(QMainWindow):
         self.ui.search.clicked.connect(self.search_friend)
 
     def setup_ui(self):
-        self.ui = Ui_ChatPage()  # Inizializza Ui_Form
-        self.ui.setupUi(self)  # Imposta Ui_Form sulla finestra principale
+        self.ui = Ui_ChatPage() 
+        self.ui.setupUi(self)  
 
         global currentpage
         currentpage = 2
@@ -1139,16 +1013,12 @@ class ChatPage(QMainWindow):
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(10)
 
-        # Itera su ciascun valore nei dati ricevuti
         for value in data:
-            # Crea un widget orizzontale che conterrà RectWidget1 e il pulsante
             h_layout = QHBoxLayout()
 
-            # Crea RectWidget1 (presumibilmente un widget personalizzato che mostra informazioni sull'amico)
             rect_widget = RectWidget1(value[0], value[1], value[2])
 
-            # Crea il pulsante associato al valore corrente
-            button = QPushButton("Chat")  # Usa value[1] per il testo del pulsante, ad esempio
+            button = QPushButton("Chat") 
             button.setStyleSheet("""QPushButton {
                                             border: 2px solid black;       
                                             background-color: white;     
@@ -1161,14 +1031,11 @@ class ChatPage(QMainWindow):
                                         }
                                     """)
 
-            # Connetti il pulsante a un metodo che esegue un'azione
             button.clicked.connect(lambda checked, v=value[0]: self.on_chat_button_clicked(v))
 
-            # Aggiungi RectWidget1 e il pulsante al layout orizzontale
             h_layout.addWidget(rect_widget)
             h_layout.addWidget(button)
 
-            # Aggiungi il layout orizzontale al layout principale
             layout.addLayout(h_layout)
 
         container.setLayout(layout)
@@ -1226,28 +1093,21 @@ def MessagesData(data):
 @sio.event
 def FriendsData(data):
     if data["user"] == username:
-        print("FRIENDS: ")
-        print(data["data"])
         window.friends_data_view.emit(data["data"])
 
 @sio.event
 def newFriendConfirmed(data):
-    print(data)
     sio.emit('ShowFriends', username)
 
 @sio.event
 def newFriend(data):
     if data["user"] == username:
-        print("New Friend: ", data["result"])
-        #window.on_new_friend_data_view(data)
         window.new_friend_data_view.emit(data["result"])
 
 @sio.event
 def statistic(data):
-    print('Statistics')
     global stats
     stats = data 
-    print(data)
     global openStatisticPage
     if openStatisticPage == True:
         window.statistic_view.emit(window)
@@ -1256,17 +1116,12 @@ def statistic(data):
 
 @sio.event
 def account(data):
-    print('Account')
     global stats
     stats = data
     window.account_view.emit(window)
 
 @sio.event
 def login_success(data):
-    print('Login Success')
-    #global Uname
-    #Uname = data
-    print(data[0])
     global firstName
     firstName = data[0][1]
     global surname
@@ -1283,49 +1138,30 @@ def login_success(data):
 
 @sio.event
 def login_unsuccess():
-    print('Login unsuccess')
     window.login_unsuccess.emit(window)
 
 @sio.event 
 def credentials_error (type_of_error):
     username_field = views.sign_up_page.RUsername
     if type_of_error == 'username':
-        print("Username used")
         username_field.setStyleSheet("border: 2px solid red; border-radius: 10px; color: red;")
-        #username_field.setText("")
-        #username_field.setPlaceholderText("Username is already used")
 
 @sio.event
 def confirmation_signup():
     sender_email = os.getenv("EMAIL")
     sender_password = os.getenv("EMAIL_PASSWORD")
     receiver_email = Semail
-    print(Semail)
     subject = "SignUp Email"
     body = "Welcome in Dama-IT, you're now part of our family ;-)"
     send_email(sender_email, sender_password, receiver_email, subject, body)
-    print("Mail inviata")
 
-    #signal emit
-    #window.signup_confirmed.emit(window.signup_window)
-
-    #global authenticated
-    #authenticated = True
-    #signup_window.on_confirm_clicked()
 
 @sio.event
 def connect():
-    #name = input("Enter your name: ")
-    #lv = input("Your game level: ")
-    
-    #settings = {'name': name, 'level': lv}
     sio.emit('connect_client')
-    print('Connected to server')
 
 
 def update(data):
-    print("UPDATE")
-    #window.homepage_window.update_board.emit(data)
     if not friends:
         window.homepage_window.on_update_board(data)
     else:
@@ -1339,17 +1175,10 @@ def connect_with_opponent():
     
     settings = {'name': name, 'level': lv, 'elo': elo}
     sio.emit('connect_match', settings)
-    print('Connected to server')
 
 @sio.event
 def moves(data):
-    print(data)
     update(data)
-
-'''@sio.event
-def starting():
-    #print(data)
-    send_messages()'''
 
 @sio.event
 def matched(data):
@@ -1362,10 +1191,6 @@ def matched(data):
         window.homepage_window.showBoard.emit(window)
     else:
         window.homepage_window.playwithfriendspage.showBoard.emit(window)
-        print('debug')
-    
-    # Start the thread for sending messages ????
-    #send_messages()
 
 @sio.event
 def debug(data):
@@ -1374,33 +1199,23 @@ def debug(data):
 @sio.event
 def globalchamp(data):
     sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
-    print(sorted_data)
     global globalChampList
     globalChampList = sorted_data
     window.glob_champ_view.emit(window)
-    #window.statisticspage_window.globalchampionshippagewindow.on_update_champ(sorted_data)
 
 @sio.event
 def localchamp(data):
-    print(data)
     sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
-    print("LOCAL CHAMP: ", sorted_data)
     global localChampList
     localChampList = sorted_data
     window.local_champ_view.emit(window)
-    #window.statisticspage_window.globalchampionshippagewindow.on_update_champ(sorted_data)'''
 
 @sio.event
 def game_finish(data):
-    print(data)
     if data[0] == username or data[1] == username:
         if data[2] == username:
-            #choice = QMessageBox.information(window, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
-            #if choice == QMessageBox.Ok:
             window.game_ended.emit(window,True)
         else:
-            #choice = QMessageBox.information(window, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
-            #if choice == QMessageBox.Ok:
             window.game_ended.emit(window,False)
 
 @sio.event
@@ -1412,12 +1227,8 @@ def rabbitmq_test(data):
 
 if __name__ == "__main__":
 
-    #sio.connect('http://127.0.0.1:5000')
-    #sio.wait()
-
     app = QApplication(sys.argv)
 
-    # Crea e mostra la finestra principale
     window = MainWindow()
     window.show()
 

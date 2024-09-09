@@ -17,7 +17,6 @@ room_id = []
 waiting_queue = []
 
 connection = mysql.connector.connect(user=os.getenv("MYSQL_USERNAME"), password=os.getenv("MYSQL_PASSWORD"), host='mysql', port="3306", database=os.getenv("MYSQL_DB"))
-print("DB connected")
 cursor = connection.cursor()
 
 credentials = pika.PlainCredentials(os.getenv("RABBITMQ_USERNAME"), os.getenv("RABBITMQ_PASSWORD"))
@@ -37,9 +36,7 @@ def handle_credentials(credentials):
     cursor.execute('SELECT MAX(StatisticID) FROM statistic')
     statistic_id = int(cursor.fetchall()[0][0])
     firstName = str(credentials['name'])
-    #firstName[0] = firstName[0].capitalize()
     surname = str(credentials['surname'])
-    #surname[0] = surname[0].capitalize()
     email = str(credentials['email'])
     password = str(credentials['password'])
     username = str(credentials['username'])
@@ -89,7 +86,6 @@ def handle_connect_match(settings):
     elo = settings['elo']
 
     connected_clients[client_id] = {'name': name, 'level': int(level), 'elo': int(elo)}
-    print(f"{name} connected with level {level}")
 
     try_match_clients(client_id)
 
@@ -107,19 +103,12 @@ def try_match_clients(sender_id):
                 matched_clients[client_id] = sender_id
                 
                 join_room(sender_id)
-                #join_room(client_id)
 
                 socketio.emit('matched', ["white","NoFriend"], room=sender_id)
                 socketio.emit('matched', ["black","NoFriend"], room=client_id)
-                            
-
-                #socketio.emit('matched', f"{sender_name} is matched with {client_data['name']} in room {sender_id}", room=sender_id)
-                #socketio.emit('matched', f"{client_data['name']} is matched with {sender_name} in room {sender_id}", room=client_id)
                 
                 room_id.append(sender_id)
 
-                #first that can send message
-                #socketio.emit('starting', room=sender_id)
                 break
 
 @socketio.on('game_end')
@@ -181,18 +170,9 @@ def handle_message(data):
     sender_id = request.sid
     receiver_id = matched_clients.get(sender_id)
 
-    #if data == 'exit':
-    #    socketio.emit('disconnect', room=sender_id)
-    #    socketio.emit('disconnect', room=receiver_id)
-    #else:
     if receiver_id:
         if receiver_id != sender_id:
-            #sender_name = connected_clients[sender_id]['name']
-            #receiver_name = connected_clients[receiver_id]['name']
-        
-            #socketio.emit('moves', f'{sender_name}: {data}', room=receiver_id)
             socketio.emit('moves', data, room=receiver_id)
-            #socketio.emit('message', f'{sender_name}: {data}', room=sender_id)
 
 @socketio.on('Statistics')
 def send_statistics (username):
@@ -274,7 +254,6 @@ def friend(data):
 def add_friend(data):
     cursor.execute(f'SELECT UserID FROM user WHERE Username="{data[0]}"')
     userid1 = cursor.fetchall()[0][0]
-    #socketio.emit('newFriendConfirmed', userid1)
     cursor.execute(f'SELECT UserID FROM user WHERE Username="{data[1]}"')
     userid2 = cursor.fetchall()[0][0]
     cursor.execute(f'SELECT * FROM friend WHERE User1={userid1} AND User2={userid2}')
@@ -314,15 +293,12 @@ def on_join(data):
     username = data['username']
     room = data['room']
     join_room(room)
-    #socketio.emit('rabbitmq_test', f'{username} has entered the room {room}.')
-    #emit('message', {'message': f'{username} has entered the room.'}, room=room)
 
 @socketio.on('leave')
 def on_leave(data):
     username = data['username']
     room = data['room']
     leave_room(room)
-    #emit('message', {'message': f'{username} has left the room.'}, room=room)
 
 @socketio.on('withdraw')
 def on_withdraw(username):
@@ -394,15 +370,12 @@ def handle_send_message(data):
     cursor.execute(f'INSERT INTO friend(User1, User2, Fmessage) values({int(userid1)}, {int(userid2)}, {int(messageid)})')
     connection.commit()
     if message:
-        # Pubblica il messaggio su RabbitMQ
         channel.basic_publish(exchange='', routing_key='chat', body=message)
         emit('message', {'message': message, 'sender': sender}, room=room)
 
 def rabbitmq_callback(ch, method, properties, body):
-    # Invia il messaggio ricevuto a tutti i client connessi alla stanza
     message = body.decode()
     socketio.emit('message', {'message': message}, broadcast=True)
-    # Consuma i messaggi dalla coda RabbitMQ
 
 channel.basic_consume(queue='chat', on_message_callback=rabbitmq_callback, auto_ack=True)
 

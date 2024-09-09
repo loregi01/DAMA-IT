@@ -80,7 +80,6 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
-    # setupUi
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
@@ -92,5 +91,4 @@ class Ui_MainWindow(object):
         self.account.setText(QCoreApplication.translate("MainWindow", u"ACCOUNT", None))
         self.statistics.setText(QCoreApplication.translate("MainWindow", u"STATISTICS", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Searched friend:", None))
-    # retranslateUi
 

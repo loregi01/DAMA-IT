@@ -24,9 +24,6 @@ class Ui_MainWindow(object):
 
     email = None
     password = None
-    
-    #def on_signin_clicked(self):
-        #print("Sign In label clicked")
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -122,9 +119,7 @@ class Ui_MainWindow(object):
         self.widget_8.setGeometry(QtCore.QRect(0, 320, 220, 30))
         self.widget_8.setObjectName("widget_8")
         self.lbl_signin = ClickableLabel("Sign In", parent=self.widget_4)
-        #self.lbl_signin = QtWidgets.QLabel(parent=self.widget_4)
         self.lbl_signin.setGeometry(QtCore.QRect(0, 250, 220, 30))
-        #self.lbl_signin.clicked.connect(self.on_signin_clicked)
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(10)

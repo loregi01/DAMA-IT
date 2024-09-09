@@ -142,7 +142,6 @@ class Ui_Form(object):
 "color: rgb(255, 255, 255);\n"
 "")
         self.go_back_label = ClickableLabel("go_back_label", parent=self.widget_2)
-        #self.go_back_label = QLabel(self.widget_2)
         self.go_back_label.setObjectName(u"go_back_label")
         self.go_back_label.setGeometry(QRect(80, 470, 121, 16))
         self.go_back_label.setStyleSheet(u"color: rgb(255, 255, 255);")
@@ -151,7 +150,6 @@ class Ui_Form(object):
         self.retranslateUi(Form)
 
         QMetaObject.connectSlotsByName(Form)
-    # setupUi
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
@@ -207,7 +205,6 @@ class Ui_Form(object):
         self.username.setPlaceholderText(QCoreApplication.translate("Form", u"Username", None))
         self.confirm_button.setText(QCoreApplication.translate("Form", u"Confirm", None))
         self.go_back_label.setText(QCoreApplication.translate("Form", u"Click here to go back", None))
-    # retranslateUi
 
     def retrieve_credentials (self):
         self.Rname = self.first_name.toPlainText()
