@@ -4,7 +4,7 @@
   - be sure to have python installed on your device (if not it's suggested to install the latest version) <br>
   - be sure to have docker installed on your device (if not it's suggested to install the latest version) <br>
   - clone the repository (git clone [URL of the repo]>) <br>
-  - create in the root directory a file called .env that must be fullfilled as follows:<br>
+  - create in the root directory a file called .env that must be fulfilled as follows:<br>
       RABBITMQ_USERNAME=myuser <br>
       RABBITMQ_PASSWORD=mypassword <br>
       RABBITMQ_IP= ... [the IP address of your rabbit container in docker] <br>
