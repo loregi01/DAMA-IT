@@ -14,7 +14,7 @@
       EMAIL= ... [the email address you want] <br>
       EMAIL_PASSWORD= ... [the password of the email address] <br>
   - navigate the imports in the client.py file and install all the libraries you've not installed yet <br>
-  - run the command [docker-compose up] to build up and run all the needed containers <br>
+  - run the command "docker-compose up" to build up and run all the needed containers <br>
   - run python ./client.py to start one client interface <br>
 <br>
 what follows is an overview of what is in place once you've done all the steps above <br>
