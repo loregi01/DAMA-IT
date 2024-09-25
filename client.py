@@ -690,7 +690,7 @@ class FriendsPage(QMainWindow):
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(0)
         for value in data:
-            rect_widget = RectWidget1(value[0], value[1], value[2])
+            rect_widget = RectWidget1(value[1], value[2], value[0])
             layout.addWidget(rect_widget)
 
         container.setLayout(layout)
