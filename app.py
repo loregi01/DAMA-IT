@@ -85,7 +85,7 @@ def handle_connect_match(settings):
     level = settings['level']
     elo = settings['elo']
 
-    connected_clients[client_id] = {'name': name, 'level': int(level), 'elo': int(elo)}
+    connected_clients[client_id] = {'name': name, 'level': int(level), 'elo': int(elo), 'game': settings['game']}
 
     if settings['game'] == "classic":
         try_match_clients(client_id)
@@ -178,7 +178,8 @@ def gameEnd(data):
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
 
-    socketio.emit('game_finish', [username, opponent_user, winner])
+    type_game = connected_clients[client_id]['game']
+    socketio.emit('game_finish', [username, opponent_user, winner, type_game])
 
 
 
@@ -386,7 +387,8 @@ def on_withdraw(username):
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
     #socketio.emit("debug", [username, opponent_user, winner])
-    socketio.emit('game_finish', [username, opponent_user, winner])
+    type_game = connected_clients[client_id]['game']
+    socketio.emit('game_finish', [username, opponent_user, winner, type_game])
 
 @socketio.on('send_message')
 def handle_send_message(data):

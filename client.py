@@ -188,15 +188,25 @@ class MainWindow(QMainWindow):
         self.messages_data_view.connect(self.on_messages_data_view)
         self.game_ended.connect(self.on_game_ended)
 
-    def on_game_ended(self,w,flag):
-        if flag:
-            choice = QMessageBox.information(self.homepage_window.playwithfriendspage.board, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
-            if choice == QMessageBox.Ok:
-                self.new_window1(self.homepage_window.playwithfriendspage.board)
+    def on_game_ended(self,w,flag, type_game):
+        if type_game == "classic":
+            if flag:
+                choice = QMessageBox.information(self.homepage_window.board, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
+                if choice == QMessageBox.Ok:
+                    self.new_window1(self.homepage_window.board)
+            else:
+                choice = QMessageBox.information(self.homepage_window.board, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
+                if choice == QMessageBox.Ok:
+                    self.new_window1(self.homepage_window.board)
         else:
-            choice = QMessageBox.information(self.homepage_window.playwithfriendspage.board, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
-            if choice == QMessageBox.Ok:
-                self.new_window1(self.homepage_window.playwithfriendspage.board)
+            if flag:
+                choice = QMessageBox.information(self.homepage_window.playwithfriendspage.board, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
+                if choice == QMessageBox.Ok:
+                    self.new_window1(self.homepage_window.playwithfriendspage.board)
+            else:
+                choice = QMessageBox.information(self.homepage_window.playwithfriendspage.board, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
+                if choice == QMessageBox.Ok:
+                    self.new_window1(self.homepage_window.playwithfriendspage.board)
 
     def on_messages_data_view(self, data):
         self.account_page_window.chat_window.private_chat_page.show_old_messages(data)
@@ -1218,9 +1228,9 @@ def game_finish(data):
     print("game_finish", data)
     if data[0] == username or data[1] == username:
         if data[2] == username:
-            window.game_ended.emit(window,True)
+            window.game_ended.emit(window,True, data[3])
         else:
-            window.game_ended.emit(window,False)
+            window.game_ended.emit(window,False, data[3])
 
 @sio.event
 def rabbitmq_test(data):
