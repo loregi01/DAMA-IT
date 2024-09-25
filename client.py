@@ -1212,6 +1212,7 @@ def debug(data):
 @sio.event
 def globalchamp(data):
     sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
+    sorted_data.reverse()
     global globalChampList
     globalChampList = sorted_data
     window.glob_champ_view.emit(window)
@@ -1219,6 +1220,7 @@ def globalchamp(data):
 @sio.event
 def localchamp(data):
     sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
+    sorted_data.reverse()
     global localChampList
     localChampList = sorted_data
     window.local_champ_view.emit(window)

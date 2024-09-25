@@ -84,13 +84,16 @@ def handle_connect_match(settings):
     name = settings['name']
     level = settings['level']
     elo = settings['elo']
-
+    global connected_clients
     connected_clients[client_id] = {'name': name, 'level': int(level), 'elo': int(elo), 'game': settings['game']}
 
-    if settings['game'] == "classic":
+    socketio.emit('debug', ["game type", settings['game']])
+    if settings['game'] == 'classic':
         try_match_clients(client_id)
 
 def try_match_clients(sender_id):
+    global connected_clients
+    global matched_clients
     sender_data = connected_clients.get(sender_id)
     sender_name = sender_data['name']
     sender_lv = sender_data['level']
@@ -157,7 +160,9 @@ def gameEnd(data):
         connection.commit()
         cursor.execute(f'SELECT Statistic FROM user WHERE Username="{opponent_user}"')
         stat_id_opp = cursor.fetchall()[0][0]
-        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
+        cursor.execute(f'SELECT * FROM statistic WHERE StatisticID="{stat_id_opp}"')
+        stat_opp = cursor.fetchall()[0]
+        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat_opp[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
         connection.commit()
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
@@ -174,7 +179,9 @@ def gameEnd(data):
         connection.commit()
         cursor.execute(f'SELECT Statistic FROM user WHERE Username="{username}"')
         stat_id_opp = cursor.fetchall()[0][0]
-        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
+        cursor.execute(f'SELECT * FROM statistic WHERE StatisticID="{stat_id_opp}"')
+        stat_opp = cursor.fetchall()[0]
+        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat_opp[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
         connection.commit()
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
@@ -220,7 +227,7 @@ def sendGlobalChamp():
 def sendLocalChamp(username):
     cursor.execute(f'SELECT UserID FROM user WHERE Username="{username}"')
     id = cursor.fetchall()[0][0]
-    cursor.execute(f'SELECT UserID,Username,Statistic FROM user JOIN friend on (User2=UserID) WHERE User1={id}')
+    cursor.execute(f'SELECT DISTINCT UserID,Username,Statistic FROM user JOIN friend on (User2=UserID) WHERE User1={id}')
     result_temp = cursor.fetchall()
     list = []
     for temp in result_temp:
@@ -228,13 +235,19 @@ def sendLocalChamp(username):
         cursor.execute(f'SELECT Elo FROM statistic WHERE StatisticID={stat_id}')
         elo = cursor.fetchall()[0][0]
         list.append((temp[1],elo))
+    cursor.execute(f'SELECT Username, Elo FROM user JOIN statistic ON Statistic = StatisticID WHERE Username="{username}"')
+    stat = cursor.fetchall()[0]
+    list.append(stat[0], stat[1])
     socketio.emit('localchamp', list)
 
 @socketio.on('PlayFriend')
 def play_friend(data):
     client_id = request.sid
     #connected_clients[client_id] = {'name': data[0], 'level': 0, 'elo': 0}
+    global waiting_queue
+    socketio.emit('debug',["1", waiting_queue])
     waiting_queue.append((client_id,data[0],data[1]))
+    socketio.emit('debug',["2", waiting_queue])
     found_ab = False
     found_ba = False
     sender_id = None
@@ -247,6 +260,10 @@ def play_friend(data):
             sender_id = t[0]
 
     if found_ab and found_ba:
+        socketio.emit('debug',["3", waiting_queue])
+        waiting_queue = [t for t in waiting_queue if t[0] != client_id]
+        waiting_queue = [t for t in waiting_queue if t[0] != sender_id]
+        socketio.emit('debug',["4", waiting_queue])
         matched_clients[sender_id] = client_id
         matched_clients[client_id] = sender_id
                 
@@ -257,7 +274,7 @@ def play_friend(data):
                                 
         room_id.append(client_id)
 
-    socketio.emit('debug',waiting_queue)
+    socketio.emit('debug',["5", waiting_queue])
 
 
 @socketio.on('SearchFriend')
@@ -339,14 +356,18 @@ def on_withdraw(username):
     opponent_user = connected_clients[opponent_id]['name']
     type_game = connected_clients[client_id]['game']
     if opponent_id in matched_clients:
+        socketio.emit("debug", "first")
         del matched_clients[opponent_id]
     if client_id in matched_clients:
+        socketio.emit("debug", "second")
         del matched_clients[client_id]
     if opponent_id in connected_clients:
+        socketio.emit("debug", "third")
         del connected_clients[opponent_id]
     if client_id in connected_clients:
+        socketio.emit("debug", "fourth")
         del connected_clients[client_id]
-    
+    socketio.emit("debug", connected_clients)
     winner = None
     if game_result == 1:
         winner = username
@@ -366,7 +387,9 @@ def on_withdraw(username):
         connection.commit()
         cursor.execute(f'SELECT Statistic FROM user WHERE Username="{opponent_user}"')
         stat_id_opp = cursor.fetchall()[0][0]
-        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
+        cursor.execute(f'SELECT * FROM statistic WHERE StatisticID="{stat_id_opp}"')
+        stat_opp = cursor.fetchall()[0]
+        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat_opp[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
         connection.commit()
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
@@ -383,7 +406,9 @@ def on_withdraw(username):
         connection.commit()
         cursor.execute(f'SELECT Statistic FROM user WHERE Username="{username}"')
         stat_id_opp = cursor.fetchall()[0][0]
-        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
+        cursor.execute(f'SELECT * FROM statistic WHERE StatisticID="{stat_id_opp}"')
+        stat_opp = cursor.fetchall()[0]
+        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat_opp[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
         connection.commit()
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
