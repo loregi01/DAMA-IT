@@ -162,7 +162,6 @@ class MainWindow(QMainWindow):
         if not sio.connected:
             sio.connect('http://127.0.0.1:5000')
             #sio.connect('http://192.168.232.16:5000')
-            #sio.connect('http://172.20.10.2:5000')
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
