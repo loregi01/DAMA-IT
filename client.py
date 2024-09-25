@@ -1016,7 +1016,7 @@ class ChatPage(QMainWindow):
         for value in data:
             h_layout = QHBoxLayout()
 
-            rect_widget = RectWidget1(value[0], value[1], value[2])
+            rect_widget = RectWidget1(value[1], value[2], value[0])
 
             button = QPushButton("Chat") 
             button.setStyleSheet("""QPushButton {
