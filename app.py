@@ -231,6 +231,7 @@ def sendLocalChamp(username):
 @socketio.on('PlayFriend')
 def play_friend(data):
     client_id = request.sid
+    connected_clients[client_id] = {'name': data[0], 'level': 0, 'elo': 0}
     waiting_queue.append((client_id,data[0],data[1]))
     found_ab = False
     found_ba = False
@@ -242,8 +243,6 @@ def play_friend(data):
         if t[1] == data[1] and t[2] == data[0]:
             found_ba = True
             sender_id = t[0]
-
-    #connected_clients[client_id] = {'name': name, 'level': int(level), 'elo': int(elo)}
 
     if found_ab and found_ba:
         matched_clients[sender_id] = client_id
