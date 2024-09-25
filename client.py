@@ -162,7 +162,6 @@ class MainWindow(QMainWindow):
         if not sio.connected:
             sio.connect('http://127.0.0.1:5000')
             #sio.connect('http://192.168.232.16:5000')
-            #sio.connect('http://172.20.10.2:5000')
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -691,7 +690,7 @@ class FriendsPage(QMainWindow):
         layout.setAlignment(Qt.Alignment.AlignTop)
         layout.setSpacing(0)
         for value in data:
-            rect_widget = RectWidget1(value[0], value[1], value[2])
+            rect_widget = RectWidget1(value[1], value[2], value[0])
             layout.addWidget(rect_widget)
 
         container.setLayout(layout)
