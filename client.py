@@ -1092,6 +1092,7 @@ def MessagesData(data):
 
 @sio.event
 def FriendsData(data):
+    print(data)
     if data["user"] == username:
         window.friends_data_view.emit(data["data"])
 

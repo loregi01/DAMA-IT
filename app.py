@@ -285,7 +285,7 @@ def add_friend(data):
 @socketio.on('ShowFriends')
 def show_friend(data):
     cursor.execute(f'SELECT u2.Username, u2.FirstName, u2.Surname FROM user AS u1, user AS u2, friend AS f WHERE u1.UserID = f.User1 AND u2.UserID = f.User2 AND u1.Username="{data}"')
-    friends_data = cursor.fetchall()[0]
+    friends_data = cursor.fetchall()
     socketio.emit('FriendsData', {"user":data, "data":friends_data})
 
 @socketio.on('retrieveMessages')
