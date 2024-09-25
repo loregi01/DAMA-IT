@@ -75,6 +75,7 @@ class Board(QGraphicsView):
 
 
     def on_button_click (self):
+        print("VOGLIO ARRENDERMI")
         self.sio.emit('withdraw',self._username)
 
     def resizeEvent(self, e):
