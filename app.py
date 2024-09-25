@@ -365,7 +365,6 @@ def on_withdraw(username):
         connection.commit()
     
     socketio.emit('game_finish', [username, opponent_user, winner])
-    emit()
 
 @socketio.on('send_message')
 def handle_send_message(data):
