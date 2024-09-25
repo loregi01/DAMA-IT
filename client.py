@@ -1088,8 +1088,7 @@ class ChatPage(QMainWindow):
 
 @sio.event
 def MessagesData(data):
-    if data[0] == username:
-        window.messages_data_view.emit(data[1])
+    window.messages_data_view.emit(data)
 
 @sio.event
 def FriendsData(data):
