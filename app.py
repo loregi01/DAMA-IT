@@ -242,7 +242,9 @@ def play_friend(data):
         if t[1] == data[1] and t[2] == data[0]:
             found_ba = True
             sender_id = t[0]
-    
+
+    #connected_clients[client_id] = {'name': name, 'level': int(level), 'elo': int(elo)}
+
     if found_ab and found_ba:
         matched_clients[sender_id] = client_id
         matched_clients[client_id] = sender_id
@@ -318,17 +320,21 @@ def on_leave(data):
 
 @socketio.on('withdraw')
 def on_withdraw(username):
+    socketio.emit("debug", "1")
     client_id = None
     game_result = 2
     for key, value in connected_clients.items():
         if value.get("name") == username:
             client_id = key
             break
+    socketio.emit("debug", "2")
     if not client_id:
         return
+    socketio.emit("debug", "3")
     opponent_id = matched_clients[client_id] if client_id in matched_clients else None
     if opponent_id == None:
         return
+    socketio.emit("debug", "4")
     opponent_user = connected_clients[opponent_id]['name']
     if opponent_id in matched_clients:
         del matched_clients[opponent_id]
@@ -379,7 +385,7 @@ def on_withdraw(username):
         connection.commit()
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
-    
+    socketio.emit("debug", [username, opponent_user, winner])
     socketio.emit('game_finish', [username, opponent_user, winner])
 
 @socketio.on('send_message')
