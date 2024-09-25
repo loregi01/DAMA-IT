@@ -1213,6 +1213,7 @@ def localchamp(data):
 
 @sio.event
 def game_finish(data):
+    print("game_finish", data)
     if data[0] == username or data[1] == username:
         if data[2] == username:
             window.game_ended.emit(window,True)
