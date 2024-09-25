@@ -87,7 +87,8 @@ def handle_connect_match(settings):
 
     connected_clients[client_id] = {'name': name, 'level': int(level), 'elo': int(elo)}
 
-    try_match_clients(client_id)
+    if settings['game'] == "classic":
+        try_match_clients(client_id)
 
 def try_match_clients(sender_id):
     sender_data = connected_clients.get(sender_id)
@@ -231,7 +232,7 @@ def sendLocalChamp(username):
 @socketio.on('PlayFriend')
 def play_friend(data):
     client_id = request.sid
-    connected_clients[client_id] = {'name': data[0], 'level': 0, 'elo': 0}
+    #connected_clients[client_id] = {'name': data[0], 'level': 0, 'elo': 0}
     waiting_queue.append((client_id,data[0],data[1]))
     found_ab = False
     found_ba = False

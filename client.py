@@ -814,6 +814,8 @@ class PlayWithFriendsPage(QMainWindow):
     def on_play_friend_button_clicked(self, value_friend):
         global friends
         friends = True
+        settings = {'name': username, 'level': 0, 'elo': 0, 'game': "friend"}
+        sio.emit('connect_match', settings)
         sio.emit('PlayFriend', [username, value_friend])
         self.close()
         self.waiting_page = WaitingPage()
@@ -1174,7 +1176,7 @@ def connect_with_opponent():
     lv = stats[0][5]
     elo = stats[0][4]
     
-    settings = {'name': name, 'level': lv, 'elo': elo}
+    settings = {'name': name, 'level': lv, 'elo': elo, 'game': "classic"}
     sio.emit('connect_match', settings)
 
 @sio.event
