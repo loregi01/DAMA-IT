@@ -301,7 +301,7 @@ def ret_messages(data):
     messages = cursor.fetchall()
 
     sorted_messages = sorted(messages, key=lambda x: x[2])
-    socketio.emit('MessagesData', sorted_messages)
+    socketio.emit('MessagesData', {user1, sorted_messages})
 
 
 @socketio.on('join')
