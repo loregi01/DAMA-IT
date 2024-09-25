@@ -218,10 +218,10 @@ def send_stats_for_account (username):
     socketio.emit('account', result, room = request.sid) 
 
 @socketio.on('GlobalChamp')
-def sendGlobalChamp():
+def sendGlobalChamp(username):
     cursor.execute(f'SELECT Username,Elo FROM user JOIN statistic ON (Statistic=StatisticID)')
     result = cursor.fetchall()
-    socketio.emit('globalchamp', result)
+    socketio.emit('globalchamp', [result, username])
 
 @socketio.on('LocalChamp')
 def sendLocalChamp(username):
@@ -237,8 +237,8 @@ def sendLocalChamp(username):
         list.append((temp[1],elo))
     cursor.execute(f'SELECT Username, Elo FROM user JOIN statistic ON Statistic = StatisticID WHERE Username="{username}"')
     stat = cursor.fetchall()[0]
-    list.append(stat[0], stat[1])
-    socketio.emit('localchamp', list)
+    list.append((stat[0], stat[1]))
+    socketio.emit('localchamp', [list, username])
 
 @socketio.on('PlayFriend')
 def play_friend(data):

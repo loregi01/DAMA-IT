@@ -524,7 +524,7 @@ class StatisticsPage(QMainWindow):
         sio.emit('LocalChamp', username)
 
     def globalchampionshippage(self):
-        sio.emit('GlobalChamp')
+        sio.emit('GlobalChamp', username)
 
     def home_page(self):
         global currentpage
@@ -1211,19 +1211,21 @@ def debug(data):
 
 @sio.event
 def globalchamp(data):
-    sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
-    sorted_data.reverse()
-    global globalChampList
-    globalChampList = sorted_data
-    window.glob_champ_view.emit(window)
+    if data[1] == username:
+        sorted_data = sorted(data[0], key=lambda x: (int(x[1]), x[0]))
+        sorted_data.reverse()
+        global globalChampList
+        globalChampList = sorted_data
+        window.glob_champ_view.emit(window)
 
 @sio.event
 def localchamp(data):
-    sorted_data = sorted(data, key=lambda x: (int(x[1]), x[0]))
-    sorted_data.reverse()
-    global localChampList
-    localChampList = sorted_data
-    window.local_champ_view.emit(window)
+    if data[1] == username:
+        sorted_data = sorted(data[0], key=lambda x: (int(x[1]), x[0]))
+        sorted_data.reverse()
+        global localChampList
+        localChampList = sorted_data
+        window.local_champ_view.emit(window)
 
 @sio.event
 def game_finish(data):
