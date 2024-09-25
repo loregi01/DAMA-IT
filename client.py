@@ -803,10 +803,10 @@ class PlayWithFriendsPage(QMainWindow):
 
     def on_showBoard(self):
         global color
-        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username) 
-        self.board.setFixedSize(QSize(900, 600))
+        self.home_page.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username) 
+        self.home_page.board.setFixedSize(QSize(900, 600))
         self.waiting_page.close()
-        self.board.show()
+        self.home_page.board.show()
 
     def on_update_board(self, data):
         self.board.updateBoard_fromOpponent(data)

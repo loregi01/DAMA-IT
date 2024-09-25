@@ -385,7 +385,7 @@ def on_withdraw(username):
         connection.commit()
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
-    socketio.emit("debug", [username, opponent_user, winner])
+    #socketio.emit("debug", [username, opponent_user, winner])
     socketio.emit('game_finish', [username, opponent_user, winner])
 
 @socketio.on('send_message')
