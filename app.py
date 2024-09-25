@@ -128,6 +128,7 @@ def gameEnd(data):
     if opponent_id == None:
         return
     opponent_user = connected_clients[opponent_id]['name']
+    type_game = connected_clients[client_id]['game']
     if opponent_id in matched_clients:
         del matched_clients[opponent_id]
     if client_id in matched_clients:
@@ -178,7 +179,6 @@ def gameEnd(data):
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
 
-    type_game = connected_clients[client_id]['game']
     socketio.emit('game_finish', [username, opponent_user, winner, type_game])
 
 
@@ -337,6 +337,7 @@ def on_withdraw(username):
         return
     socketio.emit("debug", "4")
     opponent_user = connected_clients[opponent_id]['name']
+    type_game = connected_clients[client_id]['game']
     if opponent_id in matched_clients:
         del matched_clients[opponent_id]
     if client_id in matched_clients:
@@ -387,7 +388,6 @@ def on_withdraw(username):
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
     #socketio.emit("debug", [username, opponent_user, winner])
-    type_game = connected_clients[client_id]['game']
     socketio.emit('game_finish', [username, opponent_user, winner, type_game])
 
 @socketio.on('send_message')

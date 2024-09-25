@@ -154,7 +154,7 @@ class MainWindow(QMainWindow):
     new_friend_data_view = Signal(list)
     friends_data_view = Signal(list)
     messages_data_view = Signal(list)
-    game_ended = Signal(QMainWindow,bool)
+    game_ended = Signal(QMainWindow,bool, str)
 
     def __init__(self):
         super().__init__()
