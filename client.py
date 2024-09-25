@@ -190,13 +190,13 @@ class MainWindow(QMainWindow):
 
     def on_game_ended(self,w,flag):
         if flag:
-            choice = QMessageBox.information(self.homepage_window.board, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
+            choice = QMessageBox.information(self.homepage_window.playwithfriendspage.board, "Match ended", "YOU WIN\nGo back to homepage", QMessageBox.Ok)
             if choice == QMessageBox.Ok:
-                self.new_window1(self.homepage_window.board)
+                self.new_window1(self.homepage_window.playwithfriendspage.board)
         else:
-            choice = QMessageBox.information(self.homepage_window.board, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
+            choice = QMessageBox.information(self.homepage_window.playwithfriendspage.board, "Match ended", "YOU LOSE\nGo back to homepage", QMessageBox.Ok)
             if choice == QMessageBox.Ok:
-                self.new_window1(self.homepage_window.board)
+                self.new_window1(self.homepage_window.playwithfriendspage.board)
 
     def on_messages_data_view(self, data):
         self.account_page_window.chat_window.private_chat_page.show_old_messages(data)
@@ -803,10 +803,10 @@ class PlayWithFriendsPage(QMainWindow):
 
     def on_showBoard(self):
         global color
-        self.home_page.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username) 
-        self.home_page.board.setFixedSize(QSize(900, 600))
+        self.board = Board("HUMAN_VS_AI", 0, color, False, False, sio, username) 
+        self.board.setFixedSize(QSize(900, 600))
         self.waiting_page.close()
-        self.home_page.board.show()
+        self.board.show()
 
     def on_update_board(self, data):
         self.board.updateBoard_fromOpponent(data)
