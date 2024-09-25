@@ -299,7 +299,7 @@ def ret_messages(data):
 
     cursor.execute(f'SELECT Sender, Content, MDateTime FROM friend JOIN umessage ON MessageID = Fmessage WHERE (User1 = {userid1} AND User2 = {userid2}) OR (User1 = {userid2} AND User2 = {userid1})')
     messages = cursor.fetchall()
-
+    del messages[0]
     sorted_messages = sorted(messages, key=lambda x: x[2])
     socketio.emit('MessagesData', [user1, sorted_messages])
 
