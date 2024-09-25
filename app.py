@@ -87,7 +87,6 @@ def handle_connect_match(settings):
     global connected_clients
     connected_clients[client_id] = {'name': name, 'level': int(level), 'elo': int(elo), 'game': settings['game']}
 
-    socketio.emit('debug', ["game type", settings['game']])
     if settings['game'] == 'classic':
         try_match_clients(client_id)
 
@@ -243,11 +242,8 @@ def sendLocalChamp(username):
 @socketio.on('PlayFriend')
 def play_friend(data):
     client_id = request.sid
-    #connected_clients[client_id] = {'name': data[0], 'level': 0, 'elo': 0}
     global waiting_queue
-    socketio.emit('debug',["1", waiting_queue])
     waiting_queue.append((client_id,data[0],data[1]))
-    socketio.emit('debug',["2", waiting_queue])
     found_ab = False
     found_ba = False
     sender_id = None
@@ -260,10 +256,8 @@ def play_friend(data):
             sender_id = t[0]
 
     if found_ab and found_ba:
-        socketio.emit('debug',["3", waiting_queue])
         waiting_queue = [t for t in waiting_queue if t[0] != client_id]
         waiting_queue = [t for t in waiting_queue if t[0] != sender_id]
-        socketio.emit('debug',["4", waiting_queue])
         matched_clients[sender_id] = client_id
         matched_clients[client_id] = sender_id
                 
@@ -273,8 +267,6 @@ def play_friend(data):
         socketio.emit('matched', ["black","Friend"], room=client_id)
                                 
         room_id.append(client_id)
-
-    socketio.emit('debug',["5", waiting_queue])
 
 
 @socketio.on('SearchFriend')
@@ -338,36 +330,27 @@ def on_leave(data):
 
 @socketio.on('withdraw')
 def on_withdraw(username):
-    socketio.emit("debug", "1")
     client_id = None
     game_result = 2
     for key, value in connected_clients.items():
         if value.get("name") == username:
             client_id = key
             break
-    socketio.emit("debug", "2")
     if not client_id:
         return
-    socketio.emit("debug", "3")
     opponent_id = matched_clients[client_id] if client_id in matched_clients else None
     if opponent_id == None:
         return
-    socketio.emit("debug", "4")
     opponent_user = connected_clients[opponent_id]['name']
     type_game = connected_clients[client_id]['game']
     if opponent_id in matched_clients:
-        socketio.emit("debug", "first")
         del matched_clients[opponent_id]
     if client_id in matched_clients:
-        socketio.emit("debug", "second")
         del matched_clients[client_id]
     if opponent_id in connected_clients:
-        socketio.emit("debug", "third")
         del connected_clients[opponent_id]
     if client_id in connected_clients:
-        socketio.emit("debug", "fourth")
         del connected_clients[client_id]
-    socketio.emit("debug", connected_clients)
     winner = None
     if game_result == 1:
         winner = username
@@ -412,7 +395,6 @@ def on_withdraw(username):
         connection.commit()
         cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
-    #socketio.emit("debug", [username, opponent_user, winner])
     socketio.emit('game_finish', [username, opponent_user, winner, type_game])
 
 @socketio.on('send_message')
