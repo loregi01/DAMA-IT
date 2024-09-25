@@ -151,6 +151,14 @@ def gameEnd(data):
         connection.commit()
         cursor.execute(f'UPDATE statistic SET SLevel = "{str(int(stat[5]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
+        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat[1]) + 1)}" WHERE StatisticID="{stat_id}"')
+        connection.commit()
+        cursor.execute(f'SELECT Statistic FROM user WHERE Username="{opponent_user}"')
+        stat_id_opp = cursor.fetchall()[0][0]
+        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
+        connection.commit()
+        cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
+        connection.commit()
     else:
         cursor.execute(f'SELECT Statistic FROM user WHERE Username="{opponent_user}"')
         stat_id = cursor.fetchall()[0][0]
@@ -160,7 +168,15 @@ def gameEnd(data):
         connection.commit()
         cursor.execute(f'UPDATE statistic SET SLevel = "{str(int(stat[5]) + 1)}" WHERE StatisticID="{stat_id}"')
         connection.commit()
-    
+        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat[1]) + 1)}" WHERE StatisticID="{stat_id}"')
+        connection.commit()
+        cursor.execute(f'SELECT Statistic FROM user WHERE Username="{username}"')
+        stat_id_opp = cursor.fetchall()[0][0]
+        cursor.execute(f'UPDATE statistic SET TotGames = "{str(int(stat[1]) + 1)}" WHERE StatisticID="{stat_id_opp}"')
+        connection.commit()
+        cursor.execute(f'UPDATE statistic SET TotWins = "{str(int(stat[2]) + 1)}" WHERE StatisticID="{stat_id}"')
+        connection.commit()
+
     socketio.emit('game_finish', [username, opponent_user, winner])
 
 
