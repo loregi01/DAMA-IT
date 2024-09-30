@@ -96,7 +96,7 @@ class Ui_MainWindow(object):
         QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"DAMA IT", None))
         self.label_2.setText("")
         self.label.setText(QCoreApplication.translate("MainWindow", u"PLAY WITH FRIENDS", None))
         self.search.setText(QCoreApplication.translate("MainWindow", u"Search", None))

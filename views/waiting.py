@@ -39,6 +39,6 @@ class Ui_MainWindow(object):
         QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"DAMA IT", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"WAITING FOR AN OPPONENT...", None))
 

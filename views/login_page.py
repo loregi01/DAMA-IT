@@ -147,9 +147,9 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "DAMA IT"))
         self.label_2.setText(_translate("MainWindow", "DAMA IT"))
         self.txt_email.setPlaceholderText(_translate("MainWindow", "email"))
         self.txt_password.setPlaceholderText(_translate("MainWindow", "password"))
         self.btn_login.setText(_translate("MainWindow", "Login"))
-        self.lbl_signin.setText(_translate("MainWindow", "Are you not registered yet? Sign in"))
+        self.lbl_signin.setText(_translate("MainWindow", "Are you not registered yet? Sign up"))
