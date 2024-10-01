@@ -418,6 +418,8 @@ def handle_send_message(data):
     if message:
         channel.basic_publish(exchange='', routing_key='chat', body=message)
         emit('message', {'message': message, 'sender': sender}, room=room)
+        channel.basic_consume(queue='chat', on_message_callback=rabbitmq_callback, auto_ack=True)
+
 
 def rabbitmq_callback(ch, method, properties, body):
     message = body.decode()

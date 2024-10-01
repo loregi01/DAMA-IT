@@ -158,7 +158,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("DAMA IT")
+        
         self.new_window_instance = None
         if not sio.connected:
             sio.connect('http://127.0.0.1:5000')
